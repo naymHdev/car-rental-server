@@ -1,10 +1,11 @@
-import { Document } from 'mongoose';
-import { IUser } from '../user/user.interface';
+import { Document } from "mongoose";
+import { IUser } from "../user/user.interface";
+import { TRole } from "../../types/express";
 
-export interface IAdmin extends IUser {
-  contactNumber: string;
+export interface IAdmin
+  extends Omit<IUser, "firstName" | "lastName" | "location"> {
+  role: TRole;
 }
-
 export interface IRecentActivity extends Document {
   title: string;
 }

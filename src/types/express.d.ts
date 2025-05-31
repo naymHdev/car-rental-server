@@ -4,7 +4,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { IPlayer } from "../module/user/user.interface";
 import { LeanDocument } from "mongoose";
 
-export const Role = ["User", "Vendor", "Admin"] as const;
+export const Role = ["User", "Vendor", "Admin"] ;
 export type TRole = (typeof Role)[number];
 
 export interface UserPayload extends JwtPayload {

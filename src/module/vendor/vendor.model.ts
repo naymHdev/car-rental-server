@@ -1,5 +1,4 @@
 import { Model, Schema } from "mongoose";
-import MongooseHelper from "../../utility/mongoose.helpers";
 import { IVendor } from "./vendor.interface";
 import User from "../user/user.model";
 

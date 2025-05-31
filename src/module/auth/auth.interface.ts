@@ -1,19 +1,24 @@
 import { Document, Types } from "mongoose";
-import { Role } from "../../types/express";
+import { TRole } from "../../types/express";
 
-export interface ISignIn extends Document {
-  sub?: string;
+export interface IAuthProvider extends Document {
+  sub: string;
+  authProviderName: string;
+}
+export interface ISignIn {
+  isAuthProvider: boolean;
   email: string;
-  password: string;
-  role: Role;
+  password?: string;
+  authProvider?: IAuthProvider[];
 }
 export interface ISignup extends ISignIn {
-  firstName: string;
-  lastName: string;
-  userName: string;
-  mobile: string;
-  location: string;
-  authProviderName?: string;
+  firstName?: string;
+  lastName?: string;
+  userName?: string;
+  mobile?: string;
+  location?: string;
+  photo: string;
+  role: TRole;
 }
 
 export interface IOtp {
@@ -26,6 +31,6 @@ export interface IOtp {
 export interface IUserBase extends Document {
   email: string;
   password: string;
-  role: Role;
+  role: TRole;
   comparePassword(plainPassword: string): Promise<boolean>;
 }

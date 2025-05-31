@@ -2,26 +2,20 @@ import { model, Model, Schema } from "mongoose";
 import { IUser } from "./user.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
 import { Role } from "../../types/express";
-import { string } from "zod";
 
-export const UserSchema: Schema = new Schema(
+export const UserSchema: Schema = new Schema<IUser>(
   {
-    sub: {
-      type: String,
-      required: false,
-      unique: true,
-    },
     firstName: {
       type: String,
-      required: true,
+      required: false,
     },
     lastName: {
       type: String,
-      required: true,
+      required: false,
     },
     userName: {
       type: String,
-      required: true,
+      required: false,
     },
     email: {
       type: String,
@@ -31,7 +25,7 @@ export const UserSchema: Schema = new Schema(
     password: {
       type: String,
       required: function (this: IUser): boolean {
-        return !this.sub;
+        return !this.isAuthProvider;
       },
     },
     role: {
@@ -40,32 +34,41 @@ export const UserSchema: Schema = new Schema(
       required: [true, "Role is required"],
     },
     photo: {
-      type: string,
+      type: String,
       required: false,
     },
     mobile: {
-      type: string,
-      required: true,
+      type: String,
+      required: false,
     },
     location: {
-      type: string,
-      required: true,
+      type: String,
+      required: false,
     },
     authProvider: {
-      type: Boolean,
+      type: [
+        {
+          sub: {
+            type: String,
+            required: function (this: IUser): boolean {
+              return !this.isAuthProvider;
+            },
+          },
+          authProviderName: {
+            type: String,
+            required: function (this: IUser): boolean {
+              return !this.isAuthProvider;
+            },
+          },
+        },
+      ],
       required: function (this: IUser): boolean {
-        return !!this.sub;
-      },
-    },
-    authProviderName: {
-      type: String,
-      required: function (this: IUser): boolean {
-        return !!this.sub;
+        return !this.isAuthProvider;
       },
     },
     passwordUpdatedAt: {
       type: Date,
-      required: false,
+      default: Date.now(),
     },
     isDeleted: {
       type: Boolean,
@@ -79,6 +82,7 @@ MongooseHelper.preSaveHashPassword(UserSchema);
 
 MongooseHelper.comparePasswordIntoDb(UserSchema);
 MongooseHelper.findExistence<IUser>(UserSchema);
+
 MongooseHelper.applyToJSONTransform(UserSchema);
 
 const User: Model<IUser> = model<IUser>("User", UserSchema);

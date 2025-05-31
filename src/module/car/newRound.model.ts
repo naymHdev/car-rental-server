@@ -1,7 +1,7 @@
-import { model, Model, Schema, SchemaDefinition } from "mongoose";
-import { INewBattle, INewRound, IPlayer, IUser } from "./user.interface";
-import MongooseHelper from "../../utility/mongoose.helpers";
-import { timeRegex } from "../../constants/regex.constants";
+import { model, Model, Schema, SchemaDefinition } from 'mongoose';
+import { INewBattle, INewRound, IPlayer, IUser } from './car.interface';
+import MongooseHelper from '../../utility/mongoose.helpers';
+import { timeRegex } from '../../constants/regex.constants';
 
 export const NewBattleSchema: SchemaDefinition = {
   creatorId: {
@@ -14,15 +14,15 @@ export const NewBattleSchema: SchemaDefinition = {
   },
   choosePlayer: {
     type: String,
-    required: [true, "Email is required"],
+    required: [true, 'Email is required'],
   },
   roundDate: {
     type: Date,
-    required: [true, "Round Date is required"],
+    required: [true, 'Round Date is required'],
   },
   roundTime: {
     type: String,
-    required: [true, "Round time is required"],
+    required: [true, 'Round time is required'],
     validate: {
       validator: function (v: string) {
         return timeRegex.test(v);
@@ -37,7 +37,7 @@ const BattleSchema = new Schema(
   {
     ...NewBattleSchema,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const RoundSchema = new Schema(
@@ -48,7 +48,7 @@ const RoundSchema = new Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 MongooseHelper.findExistence<IPlayer>(BattleSchema);
@@ -58,8 +58,8 @@ MongooseHelper.findExistence<IPlayer>(RoundSchema);
 MongooseHelper.applyToJSONTransform(RoundSchema);
 
 export const Battle: Model<INewBattle> = model<INewBattle>(
-  "Battle",
-  BattleSchema
+  'Battle',
+  BattleSchema,
 );
 
-export const Round: Model<INewRound> = model<INewRound>("Round", RoundSchema);
+export const Round: Model<INewRound> = model<INewRound>('Round', RoundSchema);
