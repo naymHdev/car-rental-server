@@ -7,7 +7,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "start": "node dist/server.js",
     "build": "tsc",
-    "lint": "eslint ./src --config eslint.config.js",
+    "lint": "eslint ./src --config eslint.config.mjs",
     "lint:fix": "yarn lint --fix",
     "prettier": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
     "prettier:fix": "yarn prettier"
