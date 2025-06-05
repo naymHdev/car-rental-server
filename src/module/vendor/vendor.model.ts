@@ -23,5 +23,5 @@ const VendorSchema = new Schema(
 const Vendor: Model<IVendor> = User.discriminator<IVendor>(
   "Vendor",
   VendorSchema
-);
+); 
 export default Vendor;

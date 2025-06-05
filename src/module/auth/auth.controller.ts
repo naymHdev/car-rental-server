@@ -1,58 +1,40 @@
-import { RequestHandler } from 'express';
-import catchAsync from '../../utility/catchAsync';
-import AuthServices from './auth.services';
-import httpStatus from 'http-status';
-import config from '../../app/config';
-import sendResponse from '../../utility/sendResponse';
-import { Model } from 'mongoose';
-import { IUserBase } from './auth.interface';
-import { Role } from '../../types/express';
-import Player from '../player/player.model';
-import AppError from '../../app/error/AppError';
-const roleModels: Partial<Record<Role, Model<IUserBase>>> = {
-  Player: Player as unknown as Model<IUserBase>,
-};
-
+import { RequestHandler } from "express";
+import catchAsync from "../../utility/catchAsync";
+import AuthServices from "./auth.services";
+import httpStatus from "http-status";
+import config from "../../app/config";
+import sendResponse from "../../utility/sendResponse";
+import AppError from "../../app/error/AppError";
 
 const playerSignUp: RequestHandler = catchAsync(async (req, res) => {
-  const role = 'Player';
-  const { name, email, password } = req.body.data;
+  const { role } = req.body.data;
 
-  if (!name || !email || !password) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Missing required fields', '');
-  }
- const QueryModel = roleModels[role as Role];
-  const result = await AuthServices.signUpPlayer({ name, email, password, role },QueryModel! );
+  // if (!email || !password) {
+  //   throw new AppError(httpStatus.BAD_REQUEST, "Missing required fields", "");
+  // }
+  const result = await AuthServices.signUpPlayer(req.body.data);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: 'Player registered successfully',
+    message: `${role} is registered successfully`,
     data: result,
   });
 });
 
-
-
 const login: RequestHandler = catchAsync(async (req, res) => {
-  const { role } = req.body.data || {};
-  if (!role || !Object.keys(roleModels).includes(role)) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid or missing role', '');
-  }
-
-  const QueryModel = roleModels[role as Role];
-  const result = await AuthServices.loginUserIntoDb(req.body.data, QueryModel!);
+  const result = await AuthServices.loginUserIntoDb(req.body.data);
   console.log(req.body.data!);
 
   const { refreshToken, accessToken, user } = result;
-  res.cookie('refreshToken', refreshToken, {
-    secure: config.NODE_ENV === 'production',
+  res.cookie("refreshToken", refreshToken, {
+    secure: config.NODE_ENV === "production",
     httpOnly: true,
   });
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Successfully Login',
+    message: "Successfully Login",
     data: {
       accessToken,
       user: user,
@@ -60,12 +42,10 @@ const login: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-
-
 const requestForgotPassword: RequestHandler = catchAsync(async (req, res) => {
   const { email, role } = req.body.data || {};
   if (!role || !Object.keys(roleModels).includes(role)) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid or missing role', '');
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid or missing role", "");
   }
 
   const QueryModel = roleModels[role as Role];
@@ -74,26 +54,26 @@ const requestForgotPassword: RequestHandler = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'OTP sent to your email',
+    message: "OTP sent to your email",
     data: result,
   });
 });
 
 const verifyForgotPassword: RequestHandler = catchAsync(async (req, res) => {
-  const {  role } = req.body.data || {};
+  const { role } = req.body.data || {};
   if (!role || !Object.keys(roleModels).includes(role)) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid or missing role', '');
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid or missing role", "");
   }
 
   const QueryModel = roleModels[role as Role];
   const result = await AuthServices.verifyForgotPassword(
     req.body.data,
-    QueryModel!,
+    QueryModel!
   );
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Password reset successfully',
+    message: "Password reset successfully",
     data: result,
   });
 });
@@ -101,18 +81,18 @@ const verifyForgotPassword: RequestHandler = catchAsync(async (req, res) => {
 const updateUserPassword: RequestHandler = catchAsync(async (req, res) => {
   const { role } = req.body.data || {};
   if (!role || !Object.keys(roleModels).includes(role)) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid or missing role', '');
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid or missing role", "");
   }
 
   const QueryModel = roleModels[role as Role];
   const result = await AuthServices.updateUserPassword(
     req.body.data,
-    QueryModel!,
+    QueryModel!
   );
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Password updated successfully',
+    message: "Password updated successfully",
     data: result,
   });
 });
@@ -122,7 +102,7 @@ const AuthController = {
   requestForgotPassword,
   verifyForgotPassword,
   updateUserPassword,
-  playerSignUp
+  playerSignUp,
 };
 
 export default AuthController;

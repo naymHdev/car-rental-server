@@ -3,19 +3,26 @@ import { IUser } from "./user.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
 import { Role } from "../../types/express";
 
+const isRequired = function (this: IUser): boolean {
+  return !this.isAuthProvider;
+};
+const requiredProvider = function (this: IUser): boolean {
+  return this.isAuthProvider;
+};
+
 export const UserSchema: Schema = new Schema<IUser>(
   {
     firstName: {
       type: String,
-      required: false,
+      required: isRequired,
     },
     lastName: {
       type: String,
-      required: false,
+      required: isRequired,
     },
     userName: {
       type: String,
-      required: false,
+      required: isRequired,
     },
     email: {
       type: String,
@@ -24,9 +31,7 @@ export const UserSchema: Schema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: function (this: IUser): boolean {
-        return !this.isAuthProvider;
-      },
+      required: isRequired,
     },
     role: {
       type: String,
@@ -39,32 +44,26 @@ export const UserSchema: Schema = new Schema<IUser>(
     },
     mobile: {
       type: String,
-      required: false,
+      required: isRequired,
     },
     location: {
       type: String,
-      required: false,
+      required: isRequired,
     },
     authProvider: {
       type: [
         {
           sub: {
             type: String,
-            required: function (this: IUser): boolean {
-              return !this.isAuthProvider;
-            },
+            required: requiredProvider,
           },
           authProviderName: {
             type: String,
-            required: function (this: IUser): boolean {
-              return !this.isAuthProvider;
-            },
+            required: requiredProvider,
           },
         },
       ],
-      required: function (this: IUser): boolean {
-        return !this.isAuthProvider;
-      },
+      required: requiredProvider,
     },
     passwordUpdatedAt: {
       type: Date,

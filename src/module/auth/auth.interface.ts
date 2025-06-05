@@ -19,6 +19,7 @@ export interface ISignup extends ISignIn {
   location?: string;
   photo: string;
   role: TRole;
+  agreeTcp: boolean;
 }
 
 export interface IOtp {
@@ -28,9 +29,6 @@ export interface IOtp {
   expiresAt: Date;
 }
 
-export interface IUserBase extends Document {
-  email: string;
-  password: string;
-  role: TRole;
+export interface ISignUpBase extends ISignup {
   comparePassword(plainPassword: string): Promise<boolean>;
 }

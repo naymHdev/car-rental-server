@@ -1,72 +1,88 @@
-import httpStatus from 'http-status';
-import AppError from '../../app/error/AppError';
+import httpStatus from "http-status";
+import AppError from "../../app/error/AppError";
 import {
   TSignin,
   TUpdateUserPassword,
   TVerifyForgotPassword,
-} from './auth.constant';
-import config from '../../app/config';
-import ForgotPassword from './auth.model';
-import bcrypt from 'bcrypt';
-import { sendMail } from '../../app/mailer/sendMail';
-import { emailRegex } from '../../constants/regex.constants';
-import { idConverter } from '../../utility/idConverter';
-import { jwtHelpers } from '../../app/jwtHelpers/jwtHalpers';
-import { Model } from 'mongoose';
-import { ISignup, IUserBase } from './auth.interface';
-import console from 'console';
+} from "./auth.constant";
+import config from "../../app/config";
+import ForgotPassword from "./auth.model";
+import bcrypt from "bcrypt";
+import { sendMail } from "../../app/mailer/sendMail";
+import { emailRegex } from "../../constants/regex.constants";
+import { idConverter } from "../../utility/idConverter";
+import { jwtHelpers } from "../../app/jwtHelpers/jwtHalpers";
+import { Model } from "mongoose";
+import { IAuthProvider, ISignup, ISignUpBase } from "./auth.interface";
+import console from "console";
+import { getRoleModels } from "../../utility/role.utils";
+import { IUser } from "../user/user.interface";
+import { IVendor } from "../vendor/vendor.interface";
+import { IAdmin } from "../admin/admin.interface";
+import User from "../user/user.model";
 
-const signUpPlayer = async (payload: ISignup, QueryModel: Model<IUserBase>) => {
-  const { sub, email, password, name, role } = payload;
-
-  const existing = await QueryModel.findOne({ email });
+const signUpPlayer = async (payload: ISignup) => {
+  console.log(payload);
+  const { email, authProvider, role } = payload;
+  const QueryModel = getRoleModels(role);
+  const existing = await QueryModel?.findOne({ email });
   if (existing) {
-    throw new AppError(httpStatus.CONFLICT, 'Email already registered', '');
+    const existingSub =
+      existing.authProvider?.map((provider: IAuthProvider) => provider.sub) ||
+      [];
+    const isProviderExist = authProvider?.some((newProvider) =>
+      existingSub.includes(newProvider.sub)
+    );
+    if (isProviderExist) {
+      throw new AppError(
+        httpStatus.CONFLICT,
+        "Email already registered. Please, signin...",
+        ""
+      );
+    }
+    existing.authProvider?.push(...(authProvider || []));
+    await existing.save();
+    return existing;
   }
+  const newUser = await QueryModel?.create({ payload });
 
-  // const hashedPassword = await bcrypt.hash(
-  //   password,
-  //   Number(config.bcrypt_salt_rounds),
-  // );
-
-  const newUser = await QueryModel.create({
-    sub,
-    name,
-    email,
-    password,
-    role,
-  });
-
-  return await QueryModel.findById(newUser._id).select('-password');
+  return await QueryModel?.findById(newUser?._id).select("-password");
 };
 
-const loginUserIntoDb = async (
-  payload: TSignin,
-  QueryModel: Model<IUserBase>,
-) => {
-  // console.log(payload);
+const loginUserIntoDb = async (payload: TSignin) => {
+  console.log(payload);
+  const QueryModel: Model<IUser | IVendor | IAdmin> = User;
+  const query: any = { email: payload.email };
+  if (payload.sub) {
+    query["authProvider.sub"] = payload.sub;
+  }
 
   const isExist = await QueryModel.findOne(
-    { sub: payload.sub, email: payload.email },
-    { sub: 1, password: 1, _id: 1, email: 1, role: 1 },
-  );
+    query,
+    { _id: 1, password: 1, email: 1, role: 1, companyName: 1 } // Include fields needed for Vendor or other types
+  ).lean();
+
+  // const isExist = await QueryModel?.findOne(
+  //   { sub: payload.sub, email: payload.email },
+  //   { sub: 1, password: 1, _id: 1, email: 1, role: 1 }
+  // );
 
   if (!isExist) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found', '');
+    throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
   }
 
   if (payload.password) {
     const isPasswordValid = await isExist.comparePassword(payload.password);
 
     if (!isPasswordValid) {
-      throw new AppError(httpStatus.FORBIDDEN, 'This Password Not Matched', '');
+      throw new AppError(httpStatus.FORBIDDEN, "This Password Not Matched", "");
     }
   }
 
-  const user = await QueryModel.findById(await idConverter(isExist.id)).lean();
+  const user = await QueryModel.findById(await idConverter(isExist._id)).lean();
 
   const jwtPayload = {
-    id: isExist.id,
+    id: isExist._id.toString(),
     role: isExist.role,
     email: isExist.email,
   };
@@ -74,15 +90,15 @@ const loginUserIntoDb = async (
   const accessToken = jwtHelpers.generateToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    config.expires_in as string,
+    config.expires_in as string
   );
 
   const refreshToken = jwtHelpers.generateToken(
     jwtPayload,
     config.jwt_refresh_secret as string,
-    config.refresh_expires_in as string,
+    config.refresh_expires_in as string
   );
-  console.log('isUserExist: ', isExist);
+  console.log("isUserExist: ", isExist);
   return {
     accessToken,
     refreshToken,
@@ -90,18 +106,15 @@ const loginUserIntoDb = async (
   };
 };
 
-const requestForgotPassword = async (
-  email: string,
-  QueryModel: Model<IUserBase>,
-) => {
-  console.log('email: ', email);
+const requestForgotPassword = async (email: string) => {
+  console.log("email: ", email);
 
   if (!emailRegex.test(email)) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid email format', '');
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid email format", "");
   }
   const user = await QueryModel.findOne({ email });
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found', '');
+    throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -109,7 +122,7 @@ const requestForgotPassword = async (
 
   await ForgotPassword.deleteMany({ email });
 
-  const subject = 'forgot password';
+  const subject = "forgot password";
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2>Password Reset Request</h2>
@@ -136,15 +149,15 @@ const requestForgotPassword = async (
   } catch (error) {
     throw new AppError(
       httpStatus.INTERNAL_SERVER_ERROR,
-      'Failed to process password reset request',
-      error as any,
+      "Failed to process password reset request",
+      error as any
     );
   }
 };
 
 const verifyForgotPassword = async (
   payload: TVerifyForgotPassword,
-  QueryModel: Model<IUserBase>,
+  QueryModel: Model<IUserBase>
 ) => {
   const resetRecord = await ForgotPassword.findOne({
     email: payload.email,
@@ -153,27 +166,27 @@ const verifyForgotPassword = async (
   });
 
   if (!resetRecord) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid or expired OTP', '');
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid or expired OTP", "");
   }
 
   const user = await QueryModel.findOne({ email: payload.email });
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found', '');
+    throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
   }
 
   const hashedPassword = await bcrypt.hash(
     payload.newPassword,
-    Number(config.bcrypt_salt_rounds),
+    Number(config.bcrypt_salt_rounds)
   );
 
   const updatedUser = await QueryModel.findOneAndUpdate(
     { email: payload.email },
     { password: hashedPassword },
-    { new: true },
-  ).select('-password');
+    { new: true }
+  ).select("-password");
 
   if (!updatedUser) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Failed to reset password', '');
+    throw new AppError(httpStatus.NOT_FOUND, "Failed to reset password", "");
   }
 
   await ForgotPassword.deleteOne({ _id: resetRecord._id });
@@ -183,7 +196,7 @@ const verifyForgotPassword = async (
 
 const updateUserPassword = async (
   payload: TUpdateUserPassword,
-  QueryModel: Model<IUserBase>,
+  QueryModel: Model<IUserBase>
 ) => {
   const { userId, password, newPassword } = payload;
   console.log(userId);
@@ -191,11 +204,11 @@ const updateUserPassword = async (
   const userIdObject = await idConverter(userId!);
   const user = await QueryModel.findOne(
     { _id: userIdObject, isDeleted: { $ne: true } },
-    { password: 1, email: 1 },
+    { password: 1, email: 1 }
   );
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found', '');
+    throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
   }
 
   const isPasswordValid = await user.comparePassword(password);
@@ -203,24 +216,24 @@ const updateUserPassword = async (
   if (!isPasswordValid) {
     throw new AppError(
       httpStatus.FORBIDDEN,
-      'Current password is incorrect',
-      '',
+      "Current password is incorrect",
+      ""
     );
   }
 
   const hashedNewPassword = await bcrypt.hash(
     newPassword,
-    Number(config.bcrypt_salt_rounds),
+    Number(config.bcrypt_salt_rounds)
   );
 
   const updatedUser = await QueryModel.findOneAndUpdate(
     { _id: userIdObject, isDeleted: { $ne: true } },
     { password: hashedNewPassword },
-    { new: true },
-  ).select('-password');
+    { new: true }
+  ).select("-password");
 
   if (!updatedUser) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Failed to update password', '');
+    throw new AppError(httpStatus.NOT_FOUND, "Failed to update password", "");
   }
 
   return updatedUser;
