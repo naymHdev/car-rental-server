@@ -1,33 +1,26 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import httpStatus from 'http-status';
-import AppError from '../app/error/AppError';
-import catchAsync from '../utility/catchAsync';
-import config from '../app/config';
-import { AdminPayload, Role, UserPayload } from '../types/express';
-import { idConverter } from '../utility/idConverter';
-import { IPlayer } from '../module/user/user.interface';
-import { Model } from 'mongoose';
-import Player from '../module/user/user.model';
-
-const roleModels: Record<Role, Model<IPlayer> | undefined> = {
-  Player: Player,
-  Manager: undefined,
-  Admin: undefined,
-};
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import httpStatus from "http-status";
+import AppError from "../app/error/AppError";
+import catchAsync from "../utility/catchAsync";
+import config from "../app/config";
+import { AdminPayload, UserPayload } from "../types/express";
+import { idConverter } from "../utility/idConverter";
+import { Model } from "mongoose";
+import { getRoleModels } from "../utility/role.utils";
 
 const auth = (...requireRoles: string[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
-    console.log('Authorization Header:', authHeader);
-    console.log('Required Roles:', requireRoles);
+    console.log("Authorization Header:", authHeader);
+    console.log("Required Roles:", requireRoles);
 
     if (!authHeader) {
-      throw new AppError(httpStatus.UNAUTHORIZED, 'No token provided', '');
+      throw new AppError(httpStatus.UNAUTHORIZED, "No token provided", "");
     }
 
-    const token = authHeader.startsWith('Bearer ')
-      ? authHeader.split(' ')[1]
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
       : authHeader;
 
     let decoded: UserPayload | AdminPayload;
@@ -38,33 +31,33 @@ const auth = (...requireRoles: string[]) => {
     } catch {
       throw new AppError(
         httpStatus.UNAUTHORIZED,
-        'Invalid or expired token',
-        '',
+        "Invalid or expired token",
+        ""
       );
     }
 
     const { role, id, email } = decoded;
-    console.log('Decoded JWT Payload:', { role, id, email });
+    console.log("Decoded JWT Payload:", { role, id, email });
 
     if (requireRoles.length && !requireRoles.includes(role)) {
-      throw new AppError(httpStatus.FORBIDDEN, 'Access denied', '');
+      throw new AppError(httpStatus.FORBIDDEN, "Access denied", "");
     }
-    console.log('Decoded Token:', decoded);
+    console.log("Decoded Token:", decoded);
 
-    const Model = roleModels[role];
+    const QueryModel = getRoleModels(role);
     if (!Model) {
-      throw new AppError(httpStatus.FORBIDDEN, 'Role not supported', '');
+      throw new AppError(httpStatus.FORBIDDEN, "Role not supported", "");
     }
 
-    const isUserExist = await Model.findOne({
+    const isUserExist = await QueryModel.findOne({
       _id: await idConverter(id),
       email,
     }).lean();
 
     if (!isUserExist) {
-      throw new AppError(httpStatus.NOT_FOUND, `${role} not found`, '');
+      throw new AppError(httpStatus.NOT_FOUND, `${role} not found`, "");
     }
-    console.log('decode user:', isUserExist);
+    console.log("decode user:", isUserExist);
     req.user = isUserExist;
     next();
   });

@@ -1,13 +1,16 @@
 import { model, Model, Schema } from "mongoose";
 import { IUser } from "./user.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
-import { Role } from "../../types/express";
+import { IAuthProvider, Role } from "../auth/auth.interface";
 
 const isRequired = function (this: IUser): boolean {
-  return !this.isAuthProvider;
+  return !!this.isAuthProvider;
 };
 const requiredProvider = function (this: IUser): boolean {
-  return this.isAuthProvider;
+  return !this.isAuthProvider;
+};
+const isProvider = function (this: IUser): boolean {
+  return !!this.authProvider;
 };
 
 export const UserSchema: Schema = new Schema<IUser>(
@@ -27,7 +30,7 @@ export const UserSchema: Schema = new Schema<IUser>(
     email: {
       type: String,
       required: [true, "Email is required"],
-      unique: true,
+      unique: [true, "Email must be unique"],
     },
     password: {
       type: String,
@@ -49,6 +52,10 @@ export const UserSchema: Schema = new Schema<IUser>(
     location: {
       type: String,
       required: isRequired,
+    },
+    isAuthProvider: {
+      type: Boolean,
+      required: [isProvider, "Declare is this auth provider or not"],
     },
     authProvider: {
       type: [

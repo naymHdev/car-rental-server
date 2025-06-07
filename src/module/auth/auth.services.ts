@@ -2,18 +2,18 @@ import httpStatus from "http-status";
 import AppError from "../../app/error/AppError";
 import {
   TSignin,
-  TUpdateUserPassword,
-  TVerifyForgotPassword,
+  // TUpdateUserPassword,
+  // TVerifyForgotPassword,
 } from "./auth.constant";
 import config from "../../app/config";
-import ForgotPassword from "./auth.model";
-import bcrypt from "bcrypt";
-import { sendMail } from "../../app/mailer/sendMail";
-import { emailRegex } from "../../constants/regex.constants";
+// import ForgotPassword from "./auth.model";
+// import bcrypt from "bcrypt";
+// import { sendMail } from "../../app/mailer/sendMail";
+// import { emailRegex } from "../../constants/regex.constants";
 import { idConverter } from "../../utility/idConverter";
 import { jwtHelpers } from "../../app/jwtHelpers/jwtHalpers";
 import { Model } from "mongoose";
-import { IAuthProvider, ISignup, ISignUpBase } from "./auth.interface";
+import { IAuthProvider, ISignup } from "./auth.interface";
 import console from "console";
 import { getRoleModels } from "../../utility/role.utils";
 import { IUser } from "../user/user.interface";
@@ -21,8 +21,8 @@ import { IVendor } from "../vendor/vendor.interface";
 import { IAdmin } from "../admin/admin.interface";
 import User from "../user/user.model";
 
-const signUpPlayer = async (payload: ISignup) => {
-  console.log(payload);
+const signUpService = async (payload: ISignup) => {
+  console.log("signUpService:", payload);
   const { email, authProvider, role } = payload;
   const QueryModel = getRoleModels(role);
   const existing = await QueryModel?.findOne({ email });
@@ -49,7 +49,7 @@ const signUpPlayer = async (payload: ISignup) => {
   return await QueryModel?.findById(newUser?._id).select("-password");
 };
 
-const loginUserIntoDb = async (payload: TSignin) => {
+const loginService = async (payload: TSignin) => {
   console.log(payload);
   const QueryModel: Model<IUser | IVendor | IAdmin> = User;
   const query: any = { email: payload.email };
@@ -106,145 +106,148 @@ const loginUserIntoDb = async (payload: TSignin) => {
   };
 };
 
-const requestForgotPassword = async (email: string) => {
-  console.log("email: ", email);
+// const requestForgotPasswordService = async (email: string) => {
+//   console.log("email: ", email);
 
-  if (!emailRegex.test(email)) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid email format", "");
-  }
-  const user = await QueryModel.findOne({ email });
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
-  }
+//   if (!emailRegex.test(email)) {
+//     throw new AppError(httpStatus.BAD_REQUEST, "Invalid email format", "");
+//   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+//   const QueryModel = getRoleModels(role);
 
-  await ForgotPassword.deleteMany({ email });
+//   const user = await QueryModel.findOne({ email });
+//   if (!user) {
+//     throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
+//   }
 
-  const subject = "forgot password";
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2>Password Reset Request</h2>
-      <p>Use the following OTP to reset your password:</p>
-      <h3 style="background: #f0f0f0; padding: 10px; display: inline-block;">${otp}</h3>
-      <p>This code expires in 10 minutes.</p>
-      <p>If you didn't request this, please ignore this email.</p>
-    </div>
-  `;
+//   const otp = Math.floor(100000 + Math.random() * 900000).toString();
+//   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-  try {
-    await sendMail(email, subject, html);
+//   await ForgotPassword.deleteMany({ email });
 
-    const result = await ForgotPassword.create({
-      email,
-      otp,
-      expiresAt,
-    });
+//   const subject = "forgot password";
+//   const html = `
+//     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+//       <h2>Password Reset Request</h2>
+//       <p>Use the following OTP to reset your password:</p>
+//       <h3 style="background: #f0f0f0; padding: 10px; display: inline-block;">${otp}</h3>
+//       <p>This code expires in 10 minutes.</p>
+//       <p>If you didn't request this, please ignore this email.</p>
+//     </div>
+//   `;
 
-    return {
-      email: result.email,
-      expiresAt: result.expiresAt,
-    };
-  } catch (error) {
-    throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to process password reset request",
-      error as any
-    );
-  }
-};
+//   try {
+//     await sendMail(email, subject, html);
 
-const verifyForgotPassword = async (
-  payload: TVerifyForgotPassword,
-  QueryModel: Model<IUserBase>
-) => {
-  const resetRecord = await ForgotPassword.findOne({
-    email: payload.email,
-    otp: payload.otp,
-    expiresAt: { $gt: new Date() },
-  });
+//     const result = await ForgotPassword.create({
+//       email,
+//       otp,
+//       expiresAt,
+//     });
 
-  if (!resetRecord) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid or expired OTP", "");
-  }
+//     return {
+//       email: result.email,
+//       expiresAt: result.expiresAt,
+//     };
+//   } catch (error) {
+//     throw new AppError(
+//       httpStatus.INTERNAL_SERVER_ERROR,
+//       "Failed to process password reset request",
+//       error as any
+//     );
+//   }
+// };
 
-  const user = await QueryModel.findOne({ email: payload.email });
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
-  }
+// const verifyForgotPasswordService = async (
+//   payload: TVerifyForgotPassword
+//   // QueryModel: Model<IUserBase>
+// ) => {
+//   const resetRecord = await ForgotPassword.findOne({
+//     email: payload.email,
+//     otp: payload.otp,
+//     expiresAt: { $gt: new Date() },
+//   });
 
-  const hashedPassword = await bcrypt.hash(
-    payload.newPassword,
-    Number(config.bcrypt_salt_rounds)
-  );
+//   if (!resetRecord) {
+//     throw new AppError(httpStatus.BAD_REQUEST, "Invalid or expired OTP", "");
+//   }
 
-  const updatedUser = await QueryModel.findOneAndUpdate(
-    { email: payload.email },
-    { password: hashedPassword },
-    { new: true }
-  ).select("-password");
+//   const user = await QueryModel.findOne({ email: payload.email });
+//   if (!user) {
+//     throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
+//   }
 
-  if (!updatedUser) {
-    throw new AppError(httpStatus.NOT_FOUND, "Failed to reset password", "");
-  }
+//   const hashedPassword = await bcrypt.hash(
+//     payload.newPassword,
+//     Number(config.bcrypt_salt_rounds)
+//   );
 
-  await ForgotPassword.deleteOne({ _id: resetRecord._id });
+//   const updatedUser = await QueryModel.findOneAndUpdate(
+//     { email: payload.email },
+//     { password: hashedPassword },
+//     { new: true }
+//   ).select("-password");
 
-  return updatedUser;
-};
+//   if (!updatedUser) {
+//     throw new AppError(httpStatus.NOT_FOUND, "Failed to reset password", "");
+//   }
 
-const updateUserPassword = async (
-  payload: TUpdateUserPassword,
-  QueryModel: Model<IUserBase>
-) => {
-  const { userId, password, newPassword } = payload;
-  console.log(userId);
+//   await ForgotPassword.deleteOne({ _id: resetRecord._id });
 
-  const userIdObject = await idConverter(userId!);
-  const user = await QueryModel.findOne(
-    { _id: userIdObject, isDeleted: { $ne: true } },
-    { password: 1, email: 1 }
-  );
+//   return updatedUser;
+// };
 
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
-  }
+// const updateUserPasswordService = async (
+//   payload: TUpdateUserPassword
+//   // QueryModel: Model<IUserBase>
+// ) => {
+//   const { userId, password, newPassword } = payload;
+//   console.log(userId);
 
-  const isPasswordValid = await user.comparePassword(password);
+//   const userIdObject = await idConverter(userId!);
+//   const user = await QueryModel.findOne(
+//     { _id: userIdObject, isDeleted: { $ne: true } },
+//     { password: 1, email: 1 }
+//   );
 
-  if (!isPasswordValid) {
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      "Current password is incorrect",
-      ""
-    );
-  }
+//   if (!user) {
+//     throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
+//   }
 
-  const hashedNewPassword = await bcrypt.hash(
-    newPassword,
-    Number(config.bcrypt_salt_rounds)
-  );
+//   const isPasswordValid = await user.comparePassword(password);
 
-  const updatedUser = await QueryModel.findOneAndUpdate(
-    { _id: userIdObject, isDeleted: { $ne: true } },
-    { password: hashedNewPassword },
-    { new: true }
-  ).select("-password");
+//   if (!isPasswordValid) {
+//     throw new AppError(
+//       httpStatus.FORBIDDEN,
+//       "Current password is incorrect",
+//       ""
+//     );
+//   }
 
-  if (!updatedUser) {
-    throw new AppError(httpStatus.NOT_FOUND, "Failed to update password", "");
-  }
+//   const hashedNewPassword = await bcrypt.hash(
+//     newPassword,
+//     Number(config.bcrypt_salt_rounds)
+//   );
 
-  return updatedUser;
-};
+//   const updatedUser = await QueryModel.findOneAndUpdate(
+//     { _id: userIdObject, isDeleted: { $ne: true } },
+//     { password: hashedNewPassword },
+//     { new: true }
+//   ).select("-password");
+
+//   if (!updatedUser) {
+//     throw new AppError(httpStatus.NOT_FOUND, "Failed to update password", "");
+//   }
+
+//   return updatedUser;
+// };
 
 const AuthServices = {
-  loginUserIntoDb,
-  requestForgotPassword,
-  verifyForgotPassword,
-  updateUserPassword,
-  signUpPlayer,
+  signUpService,
+  loginService,
+  // requestForgotPasswordService,
+  // verifyForgotPasswordService,
+  // updateUserPasswordService,
 };
 
 export default AuthServices;
