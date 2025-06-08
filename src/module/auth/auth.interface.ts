@@ -3,15 +3,17 @@ import { TRole } from "../../types/express";
 
 export const Role = ["User", "Vendor", "Admin"] as const;
 
-export interface IAuthProvider extends Document {
-  sub: string;
-  authProviderName: string;
-}
+// export interface IAuthProvider extends Document {
+//   sub: string;
+//   authProviderName: string;
+// }
 export interface ISignIn {
   isAuthProvider: boolean;
   email: string;
   password?: string;
-  authProvider?: IAuthProvider[];
+  sub: string;
+  authProviderName: string;
+  // authProvider?: IAuthProvider[];
 }
 export interface ISignup extends ISignIn {
   firstName?: string;

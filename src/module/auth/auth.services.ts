@@ -13,7 +13,7 @@ import config from "../../app/config";
 import { idConverter } from "../../utility/idConverter";
 import { jwtHelpers } from "../../app/jwtHelpers/jwtHalpers";
 import { Model } from "mongoose";
-import { IAuthProvider, ISignup } from "./auth.interface";
+import { ISignup } from "./auth.interface";
 import console from "console";
 import { getRoleModels } from "../../utility/role.utils";
 import { IUser } from "../user/user.interface";
@@ -21,25 +21,49 @@ import { IVendor } from "../vendor/vendor.interface";
 import { IAdmin } from "../admin/admin.interface";
 import User from "../user/user.model";
 
+// const signUpService = async (payload: ISignup) => {
+//   console.log("signUpService:", payload);
+//   const { email, role } = payload;
+//   const QueryModel = getRoleModels(role);
+//   const existing = await QueryModel?.findOne({ email });
+//   if (existing) {
+//     const existingSub =
+//       existing.authProvider?.map((provider: IAuthProvider) => provider.sub) ||
+//       [];
+//     const isProviderExist = authProvider?.some((newProvider) =>
+//       existingSub.includes(newProvider.sub)
+//     );
+//     if (isProviderExist) {
+//       throw new AppError(
+//         httpStatus.CONFLICT,
+//         "Email already registered. Please, signin...",
+//         ""
+//       );
+//     }
+//     existing.authProvider?.push(...(authProvider || []));
+//     await existing.save();
+//     return existing;
+//   }
+//   const newUser = await QueryModel?.create({ payload });
+
+//   return await QueryModel?.findById(newUser?._id).select("-password");
+// };
+
 const signUpService = async (payload: ISignup) => {
   console.log("signUpService:", payload);
-  const { email, authProvider, role } = payload;
+  const { sub, email, role, password, isAuthProvider } = payload;
   const QueryModel = getRoleModels(role);
   const existing = await QueryModel?.findOne({ email });
   if (existing) {
-    const existingSub =
-      existing.authProvider?.map((provider: IAuthProvider) => provider.sub) ||
-      [];
-    const isProviderExist = authProvider?.some((newProvider) =>
-      existingSub.includes(newProvider.sub)
+    throw new AppError(
+      httpStatus.CONFLICT,
+      "Email already registered. Please, signin...",
+      ""
     );
-    if (isProviderExist) {
-      throw new AppError(
-        httpStatus.CONFLICT,
-        "Email already registered. Please, signin...",
-        ""
-      );
-    }
+  }
+  if (existing) {
+    const existingSub = existing.sub;
+
     existing.authProvider?.push(...(authProvider || []));
     await existing.save();
     return existing;
@@ -48,7 +72,6 @@ const signUpService = async (payload: ISignup) => {
 
   return await QueryModel?.findById(newUser?._id).select("-password");
 };
-
 const loginService = async (payload: TSignin) => {
   console.log(payload);
   const QueryModel: Model<IUser | IVendor | IAdmin> = User;

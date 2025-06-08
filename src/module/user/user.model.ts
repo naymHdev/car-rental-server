@@ -1,40 +1,61 @@
 import { model, Model, Schema } from "mongoose";
 import { IUser } from "./user.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
-import { IAuthProvider, Role } from "../auth/auth.interface";
+import { Role } from "../auth/auth.interface";
 
-const isRequired = function (this: IUser): boolean {
-  return !!this.isAuthProvider;
-};
-const requiredProvider = function (this: IUser): boolean {
+// Helpers
+const isRequiredForManual = function (this: IUser): boolean {
   return !this.isAuthProvider;
 };
-const isProvider = function (this: IUser): boolean {
-  return !!this.authProvider;
+
+const isRequiredForSocial = function (this: IUser): boolean {
+  return this.isAuthProvider;
 };
 
+// Schema
 export const UserSchema: Schema = new Schema<IUser>(
   {
+    // Social auth fields
+    sub: {
+      type: String,
+      required: isRequiredForSocial,
+    },
+    authProviderName: {
+      type: String,
+      required: isRequiredForSocial,
+    },
+
+    // Manual registration fields
     firstName: {
       type: String,
-      required: isRequired,
+      required: isRequiredForManual,
     },
     lastName: {
       type: String,
-      required: isRequired,
+      required: isRequiredForManual,
     },
     userName: {
       type: String,
-      required: isRequired,
+      required: isRequiredForManual,
     },
+    password: {
+      type: String,
+      required: isRequiredForManual,
+    },
+    mobile: {
+      type: String,
+      required: isRequiredForManual,
+    },
+    location: {
+      type: String,
+      required: isRequiredForManual,
+    },
+
+    // Common fields
     email: {
       type: String,
       required: [true, "Email is required"],
       unique: [true, "Email must be unique"],
-    },
-    password: {
-      type: String,
-      required: isRequired,
     },
     role: {
       type: String,
@@ -43,38 +64,15 @@ export const UserSchema: Schema = new Schema<IUser>(
     },
     photo: {
       type: String,
-      required: false,
-    },
-    mobile: {
-      type: String,
-      required: isRequired,
-    },
-    location: {
-      type: String,
-      required: isRequired,
     },
     isAuthProvider: {
       type: Boolean,
-      required: [isProvider, "Declare is this auth provider or not"],
-    },
-    authProvider: {
-      type: [
-        {
-          sub: {
-            type: String,
-            required: requiredProvider,
-          },
-          authProviderName: {
-            type: String,
-            required: requiredProvider,
-          },
-        },
-      ],
-      required: requiredProvider,
+      required: [true, "Declare if this is an auth provider user or not"],
+      default: false, // You can set to true if most users are from social login
     },
     passwordUpdatedAt: {
       type: Date,
-      default: Date.now(),
+      default: Date.now,
     },
     isDeleted: {
       type: Boolean,
@@ -84,12 +82,12 @@ export const UserSchema: Schema = new Schema<IUser>(
   { timestamps: true }
 );
 
+// Attach Mongoose Helpers
 MongooseHelper.preSaveHashPassword(UserSchema);
-
 MongooseHelper.comparePasswordIntoDb(UserSchema);
 MongooseHelper.findExistence<IUser>(UserSchema);
-
 MongooseHelper.applyToJSONTransform(UserSchema);
 
+// Export Model
 const User: Model<IUser> = model<IUser>("User", UserSchema);
 export default User;
