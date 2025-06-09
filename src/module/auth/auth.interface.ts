@@ -8,11 +8,11 @@ export const Role = ["User", "Vendor", "Admin"] as const;
 //   authProviderName: string;
 // }
 export interface ISignIn {
-  isAuthProvider: boolean;
+  isAuthProvider?: boolean;
   email: string;
   password?: string;
-  sub: string;
-  authProviderName: string;
+  sub?: string;
+  authProviderName?: string;
   // authProvider?: IAuthProvider[];
 }
 export interface ISignup extends ISignIn {

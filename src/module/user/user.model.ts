@@ -5,27 +5,24 @@ import { Role } from "../auth/auth.interface";
 
 // Helpers
 const isRequiredForManual = function (this: IUser): boolean {
-  return !this.isAuthProvider;
+  return !this.sub;
 };
 
 const isRequiredForSocial = function (this: IUser): boolean {
-  return this.isAuthProvider;
+  return !!this.sub;
 };
 
 // Schema
 export const UserSchema: Schema = new Schema<IUser>(
   {
-    // Social auth fields
     sub: {
       type: String,
-      required: isRequiredForSocial,
+      required: false,
     },
     authProviderName: {
       type: String,
       required: isRequiredForSocial,
     },
-
-    // Manual registration fields
     firstName: {
       type: String,
       required: isRequiredForManual,
@@ -50,8 +47,6 @@ export const UserSchema: Schema = new Schema<IUser>(
       type: String,
       required: isRequiredForManual,
     },
-
-    // Common fields
     email: {
       type: String,
       required: [true, "Email is required"],
@@ -64,11 +59,12 @@ export const UserSchema: Schema = new Schema<IUser>(
     },
     photo: {
       type: String,
+      required: false
     },
     isAuthProvider: {
       type: Boolean,
-      required: [true, "Declare if this is an auth provider user or not"],
-      default: false, // You can set to true if most users are from social login
+      required: [isRequiredForSocial, "Declare if this is an auth provider user or not"],
+      default: isRequiredForSocial,
     },
     passwordUpdatedAt: {
       type: Date,

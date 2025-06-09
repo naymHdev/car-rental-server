@@ -13,26 +13,26 @@ router.post(
 
 router.post(
   "/login",
-  validationRequest(AuthValidationSchema.userSignInValidation),
+  // validationRequest(AuthValidationSchema.userSignInValidation),
   AuthController.login
 );
 
-// router.post(
-//   "/forgot_password",
-//   validationRequest(AuthValidationSchema.forgotPasswordValidation),
-//   AuthController.requestForgotPassword
-// );
+router.post(
+  "/forgot_password",
+  validationRequest(AuthValidationSchema.forgotPasswordValidation),
+  AuthController.requestForgotPassword
+);
 
-// router.post(
-//   "/verify_forgot_password",
-//   validationRequest(AuthValidationSchema.verifyForgotPasswordValidation),
-//   AuthController.verifyForgotPassword
-// );
-// router.patch(
-//   "/update-password",
-//   validationRequest(AuthValidationSchema.updateUserPasswordValidation),
-//   AuthController.updateUserPassword
-// );
+router.post(
+  "/verify_forgot_password",
+  validationRequest(AuthValidationSchema.verifyForgotPasswordValidation),
+  AuthController.verifyForgotPassword
+);
+router.patch(
+  "/update-password",
+  validationRequest(AuthValidationSchema.updateUserPasswordValidation),
+  AuthController.updateUserPassword
+);
 
 const AuthRouter = router;
 

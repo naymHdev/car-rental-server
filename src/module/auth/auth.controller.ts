@@ -12,6 +12,7 @@ const signUp: RequestHandler = catchAsync(async (req, res) => {
   //   throw new AppError(httpStatus.BAD_REQUEST, "Missing required fields", "");
   // }
   const result = await AuthServices.signUpService(req.body.data);
+  console.log("register: ", result);
 
   sendResponse(res, {
     success: true,
@@ -41,63 +42,51 @@ const login: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-// const requestForgotPassword: RequestHandler = catchAsync(async (req, res) => {
-//   const { email } = req.body.data || {};
-//   // if (!role || !Object.keys(roleModels).includes(role)) {
-//   //   throw new AppError(httpStatus.BAD_REQUEST, "Invalid or missing role", "");
-//   // }
+const requestForgotPassword: RequestHandler = catchAsync(async (req, res) => {
+  const { email, role } = req.body.data || {};
+  // if (!role || !Object.keys(roleModels).includes(role)) {
+  //   throw new AppError(httpStatus.BAD_REQUEST, "Invalid or missing role", "");
+  // }
 
-//   // const QueryModel = roleModels[role as TRole];
-//   const result = await AuthServices.requestForgotPasswordService(email);
+  // const QueryModel = roleModels[role as TRole];
+  const result = await AuthServices.requestForgotPasswordService(email, role);
 
-//   sendResponse(res, {
-//     success: true,
-//     statusCode: httpStatus.OK,
-//     message: "OTP sent to your email",
-//     data: result,
-//   });
-// });
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "OTP sent to your email",
+    data: result,
+  });
+});
 
-// const verifyForgotPassword: RequestHandler = catchAsync(async (req, res) => {
-//   const { role } = req.body.data || {};
-//   // if (!role || !Object.keys(roleModels).includes(role)) {
-//   //   throw new AppError(httpStatus.BAD_REQUEST, "Invalid or missing role", "");
-//   // }
+const verifyForgotPassword: RequestHandler = catchAsync(async (req, res) => {
+  const result = await AuthServices.verifyForgotPasswordService(req.body.data);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Password reset successfully",
+    data: result,
+  });
+});
 
-//   // const QueryModel = roleModels[role as Role];
-//   const result = await AuthServices.verifyForgotPasswordService(req.body.data);
-//   sendResponse(res, {
-//     success: true,
-//     statusCode: httpStatus.OK,
-//     message: "Password reset successfully",
-//     data: result,
-//   });
-// });
-
-// const updateUserPassword: RequestHandler = catchAsync(async (req, res) => {
-//   const { role } = req.body.data || {};
-//   // if (!role || !Object.keys(roleModels).includes(role)) {
-//   //   throw new AppError(httpStatus.BAD_REQUEST, "Invalid or missing role", "");
-//   // }
-
-//   // const QueryModel = roleModels[role as Role];
-//   const result = await AuthServices.updateUserPasswordService(
-//     req.body.data,
-//   );
-//   sendResponse(res, {
-//     success: true,
-//     statusCode: httpStatus.OK,
-//     message: "Password updated successfully",
-//     data: result,
-//   });
-// });
+const updateUserPassword: RequestHandler = catchAsync(async (req, res) => {
+  const result = await AuthServices.updateUserPasswordService(
+    req.body.data,
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Password updated successfully",
+    data: result,
+  });
+});
 
 const AuthController = {
   signUp,
   login,
-  // requestForgotPassword,
-  // verifyForgotPassword,
-  // updateUserPassword,
+  requestForgotPassword,
+  verifyForgotPassword,
+  updateUserPassword,
 };
 
 export default AuthController;

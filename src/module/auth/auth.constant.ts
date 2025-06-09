@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { TRole } from "../../types/express";
 
 export type TSignin = {
   sub: string;
@@ -14,14 +15,16 @@ export type TForgotPassword = {
   email: string;
 };
 
-export type TVerifyForgotPassword = {
+export interface IVerifyForgotPassword {
   email: string;
   otp: string;
   newPassword: string;
+  role: TRole
 };
 
-export type TUpdateUserPassword = {
+export interface IUpdateUserPassword {
   userId: Types.ObjectId;
   password: string;
   newPassword: string;
+  role: TRole
 };

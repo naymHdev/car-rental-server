@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Query, Schema, UpdateQuery } from "mongoose";
 import PasswordUtils from "./password.utils";
 import { idConverter } from "./idConverter";
 import AppError from "../app/error/AppError";
@@ -20,6 +20,28 @@ const preSaveHashPassword = (schema: Schema) => {
     }
     next();
   });
+
+  const handlePasswordInQuery = async function (this: Query<unknown, unknown>, next: () => void) {
+    const update = this.getUpdate();
+
+    if (update && typeof update === "object" && !Array.isArray(update)) {
+      const updateObj = update as UpdateQuery<unknown>;
+
+      const password = updateObj.password || updateObj.$set?.password;
+      if (password) {
+        const hashed = await PasswordUtils.hashPassword(password, 10);
+        if (updateObj.password) updateObj.password = hashed;
+        if (updateObj.$set?.password) updateObj.$set.password = hashed;
+      }
+    }
+
+    next();
+  };
+
+
+  schema.pre("findOneAndUpdate", handlePasswordInQuery);
+  schema.pre("updateOne", handlePasswordInQuery);
+  schema.pre("updateMany", handlePasswordInQuery);
 };
 
 const comparePasswordIntoDb = (schema: Schema) => {
@@ -75,11 +97,16 @@ const excludeFields = (
   });
 };
 
+// const preValidation = (schema: Schema) => {
+
+// }
+
 const MongooseHelper = {
   applyToJSONTransform,
   preSaveHashPassword,
   comparePasswordIntoDb,
   findExistence,
   excludeFields,
+  // preValidation,
 };
 export default MongooseHelper;
