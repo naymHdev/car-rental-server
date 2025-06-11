@@ -11,7 +11,7 @@ const comparePassword = async (
   rawPassword: string,
   hashedPassword: string,
 ): Promise<boolean> => {
-  return rawPassword === hashedPassword;
+  return bcrypt.compare(rawPassword, hashedPassword);
 };
 
 const PasswordUtils = {

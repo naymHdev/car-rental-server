@@ -17,7 +17,6 @@ import { IUser } from "../user/user.interface";
 import { IVendor } from "../vendor/vendor.interface";
 import { IAdmin } from "../admin/admin.interface";
 import User from "../user/user.model";
-import { TRole } from "../../types/express";
 
 // const signUpService = async (payload: ISignup) => {
 //   console.log("signUpService:", payload);
@@ -139,14 +138,14 @@ const loginService = async (payload: ISignIn) => {
   };
 };
 
-const requestForgotPasswordService = async (email: string, role: TRole) => {
+const requestForgotPasswordService = async (email: string) => {
   console.log("email: ", email);
 
   if (!emailRegex.test(email)) {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid email format", "");
   }
 
-  const QueryModel = getRoleModels(role);
+  const QueryModel: Model<IUser | IVendor | IAdmin> = User;
 
   const user = await QueryModel.findOne({ email });
   if (!user) {
@@ -203,7 +202,7 @@ const verifyForgotPasswordService = async (
   if (!resetRecord) {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid or expired OTP", "");
   }
-  const QueryModel = getRoleModels(payload.role!)
+  const QueryModel: Model<IUser | IVendor | IAdmin> = User;
   if (!QueryModel) {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid role provided", '')
   }
@@ -231,11 +230,11 @@ const verifyForgotPasswordService = async (
 const updateUserPasswordService = async (
   payload: IUpdateUserPassword
 ) => {
-  const { userId, password, newPassword, role } = payload;
+  const { userId, password, newPassword } = payload;
   console.log(userId);
 
   const userIdObject = await idConverter(userId!);
-  const QueryModel = getRoleModels(role)
+  const QueryModel: Model<IUser | IVendor | IAdmin> = User;
   const user = await QueryModel.findOne(
     { _id: userIdObject, isDeleted: { $ne: true } },
     { password: 1, email: 1 }

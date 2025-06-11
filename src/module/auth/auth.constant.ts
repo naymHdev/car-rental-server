@@ -19,12 +19,10 @@ export interface IVerifyForgotPassword {
   email: string;
   otp: string;
   newPassword: string;
-  role: TRole
 };
 
 export interface IUpdateUserPassword {
   userId: Types.ObjectId;
   password: string;
   newPassword: string;
-  role: TRole
 };

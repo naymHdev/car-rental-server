@@ -43,13 +43,13 @@ const login: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const requestForgotPassword: RequestHandler = catchAsync(async (req, res) => {
-  const { email, role } = req.body.data || {};
+  const { email } = req.body.data || {};
   // if (!role || !Object.keys(roleModels).includes(role)) {
   //   throw new AppError(httpStatus.BAD_REQUEST, "Invalid or missing role", "");
   // }
 
   // const QueryModel = roleModels[role as TRole];
-  const result = await AuthServices.requestForgotPasswordService(email, role);
+  const result = await AuthServices.requestForgotPasswordService(email);
 
   sendResponse(res, {
     success: true,
