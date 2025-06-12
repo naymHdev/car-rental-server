@@ -45,6 +45,8 @@ export interface ICar {
   isDeleted: boolean;
 }
 
-export interface ICarUPdate extends ICar {
+export interface ICarUpdate extends ICar {
   carId: Types.ObjectId;
 }
+
+export type TCarUpdate = Partial<ICar> & { carId: string, vendor: string }
