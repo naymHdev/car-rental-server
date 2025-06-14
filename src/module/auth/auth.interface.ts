@@ -1,4 +1,4 @@
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 import { TRole } from "../../types/express";
 
 export const Role = ["User", "Vendor", "Admin"] as const;

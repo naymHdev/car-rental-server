@@ -4,7 +4,7 @@ import httpStatus from "http-status";
 import AppError from "../app/error/AppError";
 import catchAsync from "../utility/catchAsync";
 import config from "../app/config";
-import { AdminPayload, UserPayload } from "../types/express";
+import { UserPayload } from "../types/express";
 import { idConverter } from "../utility/idConverter";
 import { Model } from "mongoose";
 import { getRoleModels } from "../utility/role.utils";
@@ -23,11 +23,11 @@ const auth = (...requireRoles: string[]) => {
       ? authHeader.split(" ")[1]
       : authHeader;
 
-    let decoded: UserPayload | AdminPayload;
+    let decoded: UserPayload;
     try {
       decoded = jwt.verify(token, config.jwt_access_secret as string) as
-        | UserPayload
-        | AdminPayload;
+        | UserPayload;
+
     } catch {
       throw new AppError(
         httpStatus.UNAUTHORIZED,

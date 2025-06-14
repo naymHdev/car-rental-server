@@ -1,36 +1,38 @@
-// import express from 'express';
-// import BlogController from './blog.controller';
-// import validationRequest from '../../middleware/validationRequest';
-// import BlogValidationSchema from './blog.zod.validation';
-// import { uploadBlog } from '../../app/multer/blog.multer';
-// import auth from '../../middleware/auth';
-// import { USER_ROLE } from '../user/user.constant';
+import express from 'express';
+import BlogController from './blog.controller';
+import validationRequest from '../../middleware/validationRequest';
+import BlogValidationSchema from './blog.zod.validation';
+import { uploadBlog } from '../../app/multer/blog.multer';
+import auth from '../../middleware/auth';
+import { USER_ROLE } from '../user/user.constant';
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.get('/getAllBlog', BlogController.getAllBlog);
+router.get('/getBlog', BlogController.getAllBlog);
 
-// router.post(
-//   '/create-blog',
-//   uploadBlog.fields([{ name: 'blogImage', maxCount: 1 }]),
-//   validationRequest(BlogValidationSchema.createBlogValidation),
-//   BlogController.createNewBlog,
-// );
+router.get('/getAllBlog', BlogController.getAllBlog);
 
-// router.patch(
-//   '/update-blog',
-//   uploadBlog.fields([{ name: 'blogImage', maxCount: 1 }]),
-//   validationRequest(BlogValidationSchema.updateBlogValidation),
-//   BlogController.updateBlog,
-// );
+router.post(
+  '/create-blog',
+  uploadBlog.fields([{ name: 'blogImage', maxCount: 1 }]),
+  validationRequest(BlogValidationSchema.createBlogValidation),
+  BlogController.createNewBlog,
+);
 
-// router.delete(
-//   '/delete-blog',
-//   auth(USER_ROLE.SUPERADMIN),
-//   validationRequest(BlogValidationSchema.deleteBlogValidation),
-//   BlogController.deleteBlog,
-// );
+router.patch(
+  '/update-blog',
+  uploadBlog.fields([{ name: 'blogImage', maxCount: 1 }]),
+  validationRequest(BlogValidationSchema.updateBlogValidation),
+  BlogController.updateBlog,
+);
 
-// router.delete('/delete-all-blog', BlogController.deleteAllBlog);
+router.delete(
+  '/delete-blog',
+  auth(USER_ROLE.SUPERADMIN),
+  validationRequest(BlogValidationSchema.deleteBlogValidation),
+  BlogController.deleteBlog,
+);
 
-// export const BlogRouter = router;
+router.delete('/delete-all-blog', BlogController.deleteAllBlog);
+
+export const BlogRouter = router;

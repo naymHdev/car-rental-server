@@ -77,7 +77,7 @@ const deleteCarIntoDbService = async (carId: string, vendor: string) => {
         throw new AppError(httpStatus.NOT_FOUND, "No car has found")
     }
     if (vendor !== foundCar.vendor.toString()) {
-        throw new AppError(httpStatus.NOT_ACCEPTABLE, "Vendor does not match the car's vendor")
+        throw new AppError(httpStatus.NOT_ACCEPTABLE, "Vendor does not own this car")
     }
     const deleteCar = await Car.deleteOne({ _id: carIdObject })
     if (!deleteCar.deletedCount) {

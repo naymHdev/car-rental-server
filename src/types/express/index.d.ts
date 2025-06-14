@@ -15,12 +15,6 @@ export interface UserPayload extends JwtPayload {
   role: TRole;
 }
 
-export interface AdminPayload extends JwtPayload {
-  id: string;
-  email: string;
-  role: TRole;
-}
-
 export type AuthPayload = UserPayload;
 
 export interface RequestWithFiles extends Request {
