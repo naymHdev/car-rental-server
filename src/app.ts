@@ -7,8 +7,18 @@ import cookieParser from "cookie-parser";
 import notFound from "./middleware/notFound";
 import globalErrorHandler from "./middleware/globalErrorHandler";
 import rateLimit from "express-rate-limit";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 const app = express();
+
+const httpServer = createServer(app)
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+    methods: ["GET", "POST"]
+  }
+})
 
 const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

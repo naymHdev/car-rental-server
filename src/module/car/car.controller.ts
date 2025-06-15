@@ -36,17 +36,16 @@ const addNewCar: RequestHandler = catchAsync(async (req, res) => {
 
 const findCar: RequestHandler = catchAsync(async (req, res) => {
     const { carId } = req.body.data
-    console.log('userId: ', carId.toString());
+    console.log('carId: ', carId.toString());
 
     if (!carId) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Car ID is required', '');
     }
-    const result = await CarService.findCarIntoDbService(carId as string);
-
+    const result = await GenericService.findResources<ICar>(Car, await idConverter(carId));
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
-        message: 'successfully found car',
+        message: 'successfully retrieve car data',
         data: result,
     }
     )
@@ -54,12 +53,12 @@ const findCar: RequestHandler = catchAsync(async (req, res) => {
 )
 
 const findAllCar: RequestHandler = catchAsync(async (req, res) => {
-    const result = await GenericService.findAllResources<ICar>(Car, req.query);
+    const result = await GenericService.findAllResources<ICar>(Car, req.query, []);
 
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
-        message: 'successfully added new car',
+        message: 'successfully retrieve car data',
         data: result,
     }
     )
@@ -84,7 +83,7 @@ const updateCar: RequestHandler = catchAsync(async (req, res) => {
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
-        message: 'successfully added new car',
+        message: 'successfully updated car}',
         data: result,
     }
     )
@@ -103,11 +102,11 @@ const deleteCar: RequestHandler = catchAsync(async (req, res) => {
     }
     req.body.data.vendor = vendor
     const carId = await idConverter(req.body.data.carId)
-    const result = await GenericService.deleteResources<ICar>(Car, carId)
+    const result = await GenericService.deleteResources<ICar, 'vendor'>(Car, carId, await idConverter(vendor), 'vendor')
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
-        message: 'successfully added new car',
+        message: 'successfully deleted new car',
         data: result,
     }
     )

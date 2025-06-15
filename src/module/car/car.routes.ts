@@ -14,27 +14,28 @@ router.post(
 router.get(
     '/get_car',
     // validationRequest(AuthValidationSchema.playerSignUpValidation),
-    CarController.addNewCar
+    CarController.findCar
 );
 
 router.get(
     '/get_all_car',
     // validationRequest(AuthValidationSchema.playerSignUpValidation),
-    CarController.addNewCar
+    CarController.findAllCar
 );
 
 router.patch(
     '/update_car',
     auth('Vendor'),
     // validationRequest(AuthValidationSchema.playerSignUpValidation),
-    CarController.addNewCar
+    CarController.updateCar
 );
 
 router.delete(
     '/delete_car',
     auth('Vendor'),
     // validationRequest(AuthValidationSchema.playerSignUpValidation),
-    CarController.addNewCar
+    CarController.deleteCar
 );
+
 const CarRouter = router;
 export default CarRouter;
