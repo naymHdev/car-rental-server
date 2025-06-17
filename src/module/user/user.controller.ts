@@ -64,11 +64,7 @@ const deleteUser: RequestHandler = catchAsync(async (req, res) => {
   }
   req.body.data.admin = admin;
   const userId = await idConverter(req.body.data.userId);
-  const result = await GenericService.deleteResources<IUser, "">(
-    User,
-    userId,
-    ""
-  );
+  const result = await GenericService.deleteResources<IUser>(User, userId);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,

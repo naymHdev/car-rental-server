@@ -1,9 +1,6 @@
 import httpStatus from "http-status";
 import AppError from "../../app/error/AppError";
-import {
-  IUpdateUserPassword,
-  IVerifyForgotPassword,
-} from "./auth.constant";
+import { IUpdateUserPassword, IVerifyForgotPassword } from "./auth.constant";
 import config from "../../app/config";
 import ForgotPassword from "./auth.model";
 import { sendMail } from "../../app/mailer/sendMail";
@@ -47,14 +44,13 @@ import User from "../user/user.model";
 // };
 
 const signUpService = async (payload: ISignup) => {
-
   console.log("signUpService:", payload);
 
   const { email, role } = payload;
   const QueryModel = getRoleModels(role);
 
   if (!QueryModel) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid role provided", '')
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid role provided", "");
   }
 
   const existing = await QueryModel?.findOne({ email });
@@ -91,13 +87,15 @@ const loginService = async (payload: ISignIn) => {
   if (payload.sub) {
     query["sub"] = payload.sub;
     query["authProviderName"] = payload.authProviderName;
-
   }
 
-  const isExist = await QueryModel.findOne(
-    query,
-    { _id: 1, password: 1, email: 1, role: 1, companyName: 1 }
-  );
+  const isExist = await QueryModel.findOne(query, {
+    _id: 1,
+    password: 1,
+    email: 1,
+    role: 1,
+    companyName: 1,
+  });
 
   if (!isExist) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
@@ -190,9 +188,7 @@ const requestForgotPasswordService = async (email: string) => {
   }
 };
 
-const verifyForgotPasswordService = async (
-  payload: IVerifyForgotPassword
-) => {
+const verifyForgotPasswordService = async (payload: IVerifyForgotPassword) => {
   const resetRecord = await ForgotPassword.findOne({
     email: payload.email,
     otp: payload.otp,
@@ -204,7 +200,7 @@ const verifyForgotPasswordService = async (
   }
   const QueryModel: Model<IUser | IVendor | IAdmin> = User;
   if (!QueryModel) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid role provided", '')
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid role provided", "");
   }
 
   const user = await QueryModel?.findOne({ email: payload.email });
@@ -227,9 +223,7 @@ const verifyForgotPasswordService = async (
   return updatedUser;
 };
 
-const updateUserPasswordService = async (
-  payload: IUpdateUserPassword
-) => {
+const updateUserPasswordService = async (payload: IUpdateUserPassword) => {
   const { userId, password, newPassword } = payload;
   console.log(userId);
 

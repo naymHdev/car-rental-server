@@ -8,17 +8,13 @@ import notFound from "./middleware/notFound";
 import globalErrorHandler from "./middleware/globalErrorHandler";
 import rateLimit from "express-rate-limit";
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { socketio } from "./app/config/socketio.config";
+import path from "path";
 
 const app = express();
 
-const httpServer = createServer(app)
-const io = new Server(httpServer, {
-  cors: {
-    origin: '*',
-    methods: ["GET", "POST"]
-  }
-})
+const httpServer = createServer(app);
+socketio(httpServer);
 
 const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -30,6 +26,8 @@ const rateLimiter = rateLimit({
     message: "Too many requests, please try again later",
   },
 });
+
+app.use(express.static(path.resolve(__dirname, "../public/test.html")));
 
 app.use(helmet());
 
@@ -45,14 +43,17 @@ app.use(
   })
 );
 
-app.use("/src/uploads", express.static("src/uploads"));
+app.use("/src/uploads", express.static("./src/uploads"));
 
 app.get("/", (req: Request, res: Response) => {
-  res.send({
-    status: true,
-    message: "Welcome To Setup Template",
-  });
+  res.sendFile(path.resolve(__dirname, "../public/test.html"));
 });
+// app.get("/", (req: Request, res: Response) => {
+//   res.send({
+//     status: true,
+//     message: "Welcome to this Car rental website",
+//   });
+// });
 
 app.use("/api/v1", router);
 

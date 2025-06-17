@@ -1,8 +1,8 @@
-import { Server } from 'http';
-import { dbConnection, registerDBEventListener } from './app/config/db.config';
-import config from './app/config';
-import app from './app';
-import mongoose from 'mongoose';
+import { Server } from "http";
+import { dbConnection, registerDBEventListener } from "./app/config/db.config";
+import config from "./app/config";
+import app from "./app";
+import mongoose from "mongoose";
 
 let server: Server;
 
@@ -16,26 +16,26 @@ const shutdownServer = async (reason: string) => {
   console.log(`Shutting down due to ${reason}`);
   if (server) {
     server.close(() => {
-      console.log('Server has closed');
+      console.log("Server has closed");
     });
   }
   await mongoose.disconnect();
-  console.log(' 💡 MongoDB database has disconnected');
+  console.log(" 💡 MongoDB database has disconnected");
   process.exit(1);
 };
 
-process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled Rejection:', reason);
-  shutdownServer('Unhandled Rejection');
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+  shutdownServer("Unhandled Rejection");
 });
 
-process.on('unhandledException', (error) => {
-  console.error('Unhandled Exception:', error);
-  shutdownServer('Unhandled Exception');
+process.on("unhandledException", (error) => {
+  console.error("Unhandled Exception:", error);
+  shutdownServer("Unhandled Exception");
 });
 
-process.on('SIGTERM', () => shutdownServer('SIGTERM'));
-process.on('SIGINT', () => shutdownServer('SIGINT'));
+process.on("SIGTERM", () => shutdownServer("SIGTERM"));
+process.on("SIGINT", () => shutdownServer("SIGINT"));
 
 const bootstrap = async () => {
   await dbConnection();
@@ -44,6 +44,6 @@ const bootstrap = async () => {
 };
 
 bootstrap().catch((error) => {
-  console.error('❌ Bootstrap failed:', error);
-  shutdownServer('Bootstrap error');
+  console.error("❌ Bootstrap failed:", error);
+  shutdownServer("Bootstrap error");
 });
