@@ -5,3 +5,7 @@ export interface IUser extends ISignup {
   passwordUpdatedAt: Date;
   isDeleted: boolean;
 }
+
+export type TUserUpdate = Partial<IUser> & {
+  userId: string;
+};

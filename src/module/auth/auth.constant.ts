@@ -1,6 +1,3 @@
-import { Types } from "mongoose";
-import { TRole } from "../../types/express";
-
 export type TSignin = {
   sub: string;
   email: string;
@@ -15,14 +12,16 @@ export type TForgotPassword = {
   email: string;
 };
 
-export interface IVerifyForgotPassword {
+export type TVerifyOtp = {
   email: string;
   otp: string;
+};
+
+export type TResetPassword = {
+  userId: string;
   newPassword: string;
 };
 
-export interface IUpdateUserPassword {
-  userId: Types.ObjectId;
+export type TUpdatePassword = TResetPassword & {
   password: string;
-  newPassword: string;
 };

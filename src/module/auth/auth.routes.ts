@@ -24,14 +24,21 @@ router.post(
 );
 
 router.post(
-  "/verify_forgot_password",
-  validationRequest(AuthValidationSchema.verifyForgotPasswordValidation),
-  AuthController.verifyForgotPassword
+  "/verify_otp",
+  validationRequest(AuthValidationSchema.verifyOtpdValidation),
+  AuthController.verifyOtp
 );
+
+router.put(
+  "/reset_password",
+  validationRequest(AuthValidationSchema.resetPasswordValidation),
+  AuthController.resetPassword
+);
+
 router.patch(
-  "/update-password",
-  validationRequest(AuthValidationSchema.updateUserPasswordValidation),
-  AuthController.updateUserPassword
+  "/update_password",
+  validationRequest(AuthValidationSchema.updatePasswordValidation),
+  AuthController.updatePassword
 );
 
 const AuthRouter = router;

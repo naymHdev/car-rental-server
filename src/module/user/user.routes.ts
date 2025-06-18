@@ -1,17 +1,29 @@
-// src/modules/player/player.router.ts
-
-import express from 'express';
-// import validationRequest from '../../middleware/validationRequest';
-// import AuthValidationSchema from '../auth/auth.validation';
-// import AuthController from '../auth/auth.controller';
+import express from "express";
+import UserController from "./user.controller";
 
 const router = express.Router();
 
-// router.post(
-//   '/signup',
-//   validationRequest(AuthValidationSchema.playerSignUpValidation),
-//   AuthController.playerSignUp,
-// );
+router.get(
+  "/get_user",
+  //   validationRequest(AuthValidationSchema.playerSignUpValidation),
+  UserController.getUser
+);
+router.get(
+  "/get_all_user",
+  //   validationRequest(AuthValidationSchema.playerSignUpValidation),
+  UserController.getAllUser
+);
+router.patch(
+  "/update_user",
+  //   validationRequest(AuthValidationSchema.playerSignUpValidation),
+  UserController.updateUser
+);
 
-// const PlayerRouter = router;
-export default router;
+router.delete(
+  "/delete_user",
+  //   validationRequest(AuthValidationSchema.playerSignUpValidation),
+  UserController.deleteUser
+);
+
+const UserRouter = router;
+export default UserRouter;

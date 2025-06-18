@@ -1,8 +1,6 @@
 import httpStatus from "http-status";
 import AppError from "../../app/error/AppError";
-import { IUpdateUserPassword, IVerifyForgotPassword } from "./auth.constant";
 import config from "../../app/config";
-import ForgotPassword from "./auth.model";
 import { sendMail } from "../../app/mailer/sendMail";
 import { emailRegex } from "../../constants/regex.constants";
 import { idConverter } from "../../utility/idConverter";
@@ -14,6 +12,8 @@ import { IUser } from "../user/user.interface";
 import { IVendor } from "../vendor/vendor.interface";
 import { IAdmin } from "../admin/admin.interface";
 import User from "../user/user.model";
+import { TResetPassword, TUpdatePassword, TVerifyOtp } from "./auth.constant";
+import Otp from "./auth.model";
 
 // const signUpService = async (payload: ISignup) => {
 //   console.log("signUpService:", payload);
@@ -54,12 +54,18 @@ const signUpService = async (payload: ISignup) => {
   }
 
   const existing = await QueryModel?.findOne({ email });
+
   if (existing) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      "Email already registered. Please, signin...",
-      ""
-    );
+    if (role !== "Admin") {
+      throw new AppError(
+        httpStatus.CONFLICT,
+        "Email already registered. Please, signin...",
+        ""
+      );
+    } else {
+      const login = await loginService({email, payload.password!});
+      return login
+    }
   }
 
   // if (existing && existing?.sub && (existing?.sub === sub)) {
@@ -153,7 +159,7 @@ const requestForgotPasswordService = async (email: string) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-  await ForgotPassword.deleteMany({ email });
+  await Otp.deleteMany({ email });
 
   const subject = "forgot password";
   const html = `
@@ -169,7 +175,7 @@ const requestForgotPasswordService = async (email: string) => {
   try {
     await sendMail(email, subject, html);
 
-    const result = await ForgotPassword.create({
+    const result = await Otp.create({
       email,
       otp,
       expiresAt,
@@ -177,6 +183,7 @@ const requestForgotPasswordService = async (email: string) => {
 
     return {
       email: result.email,
+      otp: otp,
       expiresAt: result.expiresAt,
     };
   } catch (error) {
@@ -188,14 +195,14 @@ const requestForgotPasswordService = async (email: string) => {
   }
 };
 
-const verifyForgotPasswordService = async (payload: IVerifyForgotPassword) => {
-  const resetRecord = await ForgotPassword.findOne({
+const verifyOtpService = async (payload: TVerifyOtp) => {
+  const otpRecord = await Otp.findOne({
     email: payload.email,
     otp: payload.otp,
     expiresAt: { $gt: new Date() },
   });
 
-  if (!resetRecord) {
+  if (!otpRecord) {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid or expired OTP", "");
   }
   const QueryModel: Model<IUser | IVendor | IAdmin> = User;
@@ -205,12 +212,31 @@ const verifyForgotPasswordService = async (payload: IVerifyForgotPassword) => {
 
   const user = await QueryModel?.findOne({ email: payload.email });
   if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "Email not registered", "");
+  }
+  await Otp.deleteOne({ _id: otpRecord._id });
+
+  return { user: user };
+};
+
+const resetPasswordService = async (payload: TResetPassword) => {
+  const { userId, newPassword } = payload;
+  console.log(userId);
+
+  const userIdObject = await idConverter(userId!);
+  const QueryModel: Model<IUser | IVendor | IAdmin> = User;
+  const user = await QueryModel.findOne(
+    { _id: userIdObject, isDeleted: { $ne: true } },
+    { password: 1, email: 1 }
+  );
+
+  if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
   }
 
   const updatedUser = await QueryModel.findOneAndUpdate(
-    { email: payload.email },
-    { password: payload.newPassword },
+    { _id: userIdObject, isDeleted: { $ne: true } },
+    { password: newPassword },
     { new: true }
   ).select("-password");
 
@@ -218,12 +244,10 @@ const verifyForgotPasswordService = async (payload: IVerifyForgotPassword) => {
     throw new AppError(httpStatus.NOT_FOUND, "Failed to reset password", "");
   }
 
-  await ForgotPassword.deleteOne({ _id: resetRecord._id });
-
   return updatedUser;
 };
 
-const updateUserPasswordService = async (payload: IUpdateUserPassword) => {
+const updatePasswordService = async (payload: TUpdatePassword) => {
   const { userId, password, newPassword } = payload;
   console.log(userId);
 
@@ -265,8 +289,9 @@ const AuthServices = {
   signUpService,
   loginService,
   requestForgotPasswordService,
-  verifyForgotPasswordService,
-  updateUserPasswordService,
+  verifyOtpService,
+  resetPasswordService,
+  updatePasswordService,
 };
 
 export default AuthServices;

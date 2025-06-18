@@ -13,3 +13,7 @@ export interface IRecentActivity extends Document {
 export interface IReport extends Document {
   title: string;
 }
+
+export type TAdminUpdate = Partial<IAdmin> & {
+  adminId: string;
+};

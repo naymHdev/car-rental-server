@@ -44,35 +44,37 @@ const login: RequestHandler = catchAsync(async (req, res) => {
 
 const requestForgotPassword: RequestHandler = catchAsync(async (req, res) => {
   const { email } = req.body.data || {};
-  // if (!role || !Object.keys(roleModels).includes(role)) {
-  //   throw new AppError(httpStatus.BAD_REQUEST, "Invalid or missing role", "");
-  // }
-
-  // const QueryModel = roleModels[role as TRole];
   const result = await AuthServices.requestForgotPasswordService(email);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "OTP sent to your email",
+    message: `OTP sent to your email:${email}`,
     data: result,
   });
 });
 
-const verifyForgotPassword: RequestHandler = catchAsync(async (req, res) => {
-  const result = await AuthServices.verifyForgotPasswordService(req.body.data);
+const verifyOtp: RequestHandler = catchAsync(async (req, res) => {
+  const result = await AuthServices.verifyOtpService(req.body.data);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Password reset successfully",
+    message: "Otp verified successfully",
     data: result,
   });
 });
 
-const updateUserPassword: RequestHandler = catchAsync(async (req, res) => {
-  const result = await AuthServices.updateUserPasswordService(
-    req.body.data,
-  );
+const resetPassword: RequestHandler = catchAsync(async (req, res) => {
+  const result = await AuthServices.resetPasswordService(req.body.data);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Password updated successfully",
+    data: result,
+  });
+});
+const updatePassword: RequestHandler = catchAsync(async (req, res) => {
+  const result = await AuthServices.updatePasswordService(req.body.data);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -85,8 +87,9 @@ const AuthController = {
   signUp,
   login,
   requestForgotPassword,
-  verifyForgotPassword,
-  updateUserPassword,
+  verifyOtp,
+  resetPassword,
+  updatePassword,
 };
 
 export default AuthController;

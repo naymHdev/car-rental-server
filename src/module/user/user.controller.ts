@@ -7,6 +7,7 @@ import GenericService from "../../utility/genericService.helpers";
 import User from "./user.model";
 import { IUser } from "./user.interface";
 import { idConverter } from "../../utility/idConverter";
+import UserServices from "./user.services";
 
 const getUser: RequestHandler = catchAsync(async (req, res) => {
   const { userId } = req.body.data;
@@ -28,16 +29,6 @@ const getUser: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const getAllUser: RequestHandler = catchAsync(async (req, res) => {
-  if (!req.user) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "User not authenticated", "");
-  }
-  const adminId = req.user?._id;
-  console.log("adminId: ", adminId.toString());
-
-  if (!adminId) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Admin ID is required", "");
-  }
-  req.body.data.admin = adminId;
   const result = await GenericService.findAllResources<IUser>(User, req.query, [
     "email",
     "userName",
@@ -48,6 +39,27 @@ const getAllUser: RequestHandler = catchAsync(async (req, res) => {
     success: true,
     statusCode: httpStatus.CREATED,
     message: "successfully retrieve users",
+    data: result,
+  });
+});
+
+const updateUser: RequestHandler = catchAsync(async (req, res) => {
+  if (!req.user) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not authenticated", "");
+  }
+  const userId = req.user?._id;
+  console.log("userId: ", userId.toString());
+
+  if (!userId) {
+    throw new AppError(httpStatus.BAD_REQUEST, "userId is required", "");
+  }
+  req.body.data.userId = userId;
+  const result = await UserServices.updateUserService(req.body.data);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "successfully updated user profile",
     data: result,
   });
 });
@@ -76,6 +88,7 @@ const deleteUser: RequestHandler = catchAsync(async (req, res) => {
 const UserController = {
   getUser,
   getAllUser,
+  updateUser,
   deleteUser,
 };
 
