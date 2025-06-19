@@ -38,6 +38,7 @@
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/mime-types": "^3.0.1",
     "@types/mongoose": "^5.11.97",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.15.24",
@@ -54,6 +55,7 @@
     "typescript-eslint": "^8.33.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.830.0",
     "aws-sdk": "^2.1692.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
@@ -64,6 +66,7 @@
     "helmet": "^8.1.0",
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mime-types": "^3.0.1",
     "mongoose": "^8.15.1",
     "multer": "^2.0.0",
     "nodemailer": "^7.0.3",

@@ -1,5 +1,7 @@
 import express from "express";
 import UserController from "./user.controller";
+import { upload } from "../../middleware/multer/multer";
+import { fileHandle } from "../../middleware/fileHandle";
 
 const router = express.Router();
 
@@ -15,6 +17,8 @@ router.get(
 );
 router.patch(
   "/update_user",
+  upload.fields([{ name: "photo", maxCount: 1 }]),
+  fileHandle("photo"),
   //   validationRequest(AuthValidationSchema.playerSignUpValidation),
   UserController.updateUser
 );

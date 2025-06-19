@@ -59,11 +59,14 @@ export const UserSchema: Schema = new Schema<IUser>(
     },
     photo: {
       type: String,
-      required: false
+      required: false,
     },
     isAuthProvider: {
       type: Boolean,
-      required: [isRequiredForSocial, "Declare if this is an auth provider user or not"],
+      required: [
+        isRequiredForSocial,
+        "Declare if this is an auth provider user or not",
+      ],
       default: isRequiredForSocial,
     },
     passwordUpdatedAt: {

@@ -8,6 +8,7 @@ import User from "./user.model";
 import { IUser } from "./user.interface";
 import { idConverter } from "../../utility/idConverter";
 import UserServices from "./user.services";
+import { emitMessage } from "../../utility/socket.helpers";
 
 const getUser: RequestHandler = catchAsync(async (req, res) => {
   const { userId } = req.body.data;
@@ -56,6 +57,9 @@ const updateUser: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.userId = userId;
   const result = await UserServices.updateUserService(req.body.data);
 
+  emitMessage("update_user", {
+    message: `userId:${result.user._id.toString()} updated successfully`,
+  });
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -77,6 +81,11 @@ const deleteUser: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.admin = admin;
   const userId = await idConverter(req.body.data.userId);
   const result = await GenericService.deleteResources<IUser>(User, userId);
+
+  emitMessage("delete_user", {
+    message: `A user deleted successfully`,
+  });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,

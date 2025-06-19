@@ -1,7 +1,7 @@
-import dotenv from 'dotenv';
-import path from 'path';
+import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config({ path: path.join(process.cwd(), '.env') });
+dotenv.config({ path: path.join(process.cwd(), ".env") });
 
 export default {
   port: process.env.PORT,
@@ -23,8 +23,10 @@ export default {
 
   NODE_ENV: process.env.NODE_ENV,
 
-  aws_access_key_id: process.env.AWS_ACCESS_KEY_ID,
-  aws_secret_access_key: process.env.AWS_SECRET_ACCESS_KEY,
-  aws_region: process.env.AWS_REGION,
-  aws_bucket_name: process.env.AWS_S3_BUCKET_NAME,
+  aws: {
+    region: process.env.AWS_REGION,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    bucket: process.env.AWS_S3_BUCKET_NAME,
+  },
 };

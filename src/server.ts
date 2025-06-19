@@ -3,6 +3,7 @@ import { dbConnection, registerDBEventListener } from "./app/config/db.config";
 import config from "./app/config";
 import app from "./app";
 import mongoose from "mongoose";
+import { testS3 } from "./app/config/s3Bucket.config";
 
 let server: Server;
 
@@ -39,6 +40,7 @@ process.on("SIGINT", () => shutdownServer("SIGINT"));
 
 const bootstrap = async () => {
   await dbConnection();
+  await testS3();
   await registerDBEventListener();
   await startServer();
 };

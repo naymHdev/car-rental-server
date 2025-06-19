@@ -56,17 +56,30 @@ const signUpService = async (payload: ISignup) => {
   const existing = await QueryModel?.findOne({ email });
 
   if (existing) {
-    if (role !== "Admin") {
-      throw new AppError(
-        httpStatus.CONFLICT,
-        "Email already registered. Please, signin...",
-        ""
-      );
-    } else {
-      const login = await loginService({email, payload.password!});
-      return login
-    }
+    throw new AppError(
+      httpStatus.CONFLICT,
+      "Email already registered. Please, signin...",
+      ""
+    );
   }
+
+  // if (existing) {
+  //   if (role !== "Admin") {
+  //     throw new AppError(
+  //       httpStatus.CONFLICT,
+  //       "Email already registered. Please, signin...",
+  //       ""
+  //     );
+  //   } else {
+  //     if (payload.password && role === "Admin") {
+  //       const login = await loginService({
+  //         email: email,
+  //         password: payload.password,
+  //       });
+  //       return login;
+  //     }
+  //   }
+  // }
 
   // if (existing && existing?.sub && (existing?.sub === sub)) {
   //   throw new AppError(
@@ -83,7 +96,8 @@ const signUpService = async (payload: ISignup) => {
 
   const newUser = await QueryModel?.create(payload);
 
-  return await QueryModel?.findById(newUser?._id).select("-password");
+  const signUp = await QueryModel?.findById(newUser?._id).select("-password");
+  return { signUp: signUp };
 };
 
 const loginService = async (payload: ISignIn) => {
@@ -244,7 +258,7 @@ const resetPasswordService = async (payload: TResetPassword) => {
     throw new AppError(httpStatus.NOT_FOUND, "Failed to reset password", "");
   }
 
-  return updatedUser;
+  return {user:updatedUser};
 };
 
 const updatePasswordService = async (payload: TUpdatePassword) => {
@@ -282,7 +296,7 @@ const updatePasswordService = async (payload: TUpdatePassword) => {
     throw new AppError(httpStatus.NOT_FOUND, "Failed to update password", "");
   }
 
-  return updatedUser;
+  return {user:updatedUser};
 };
 
 const AuthServices = {

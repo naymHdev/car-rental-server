@@ -8,6 +8,7 @@ import { idConverter } from "../../utility/idConverter";
 import { IVendor } from "./vendor.interface";
 import Vendor from "./vendor.model";
 import VendorServices from "./vendor.services";
+import { emitMessage } from "../../utility/socket.helpers";
 
 const getVendor: RequestHandler = catchAsync(async (req, res) => {
   const { VendorId } = req.body.data;
@@ -56,6 +57,10 @@ const updateVendor: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.VendorId = VendorId;
   const result = await VendorServices.updateVendorService(req.body.data);
 
+  emitMessage("update_vendor", {
+    message: `vendorId:${result.vendor._id.toString()} updated successfully`,
+  });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -80,6 +85,11 @@ const deleteVendor: RequestHandler = catchAsync(async (req, res) => {
     Vendor,
     VendorId
   );
+
+  emitMessage("update_vendor", {
+    message: `A vendor deleted successfully`,
+  });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,

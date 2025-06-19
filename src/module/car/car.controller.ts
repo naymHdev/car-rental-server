@@ -8,6 +8,7 @@ import GenericService from "../../utility/genericService.helpers";
 import { idConverter } from "../../utility/idConverter";
 import { ICar } from "./car.interface";
 import Car from "./car.model";
+import { emitMessage } from "../../utility/socket.helpers";
 
 const addNewCar: RequestHandler = catchAsync(async (req, res) => {
   const { carId } = req.body.data;
@@ -20,6 +21,9 @@ const addNewCar: RequestHandler = catchAsync(async (req, res) => {
     Car,
     await idConverter(carId)
   );
+  emitMessage("add_new_car", {
+    message: "new car added",
+  });
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -39,6 +43,7 @@ const findCar: RequestHandler = catchAsync(async (req, res) => {
     Car,
     await idConverter(carId)
   );
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -75,6 +80,10 @@ const updateCar: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.vendor = vendor;
   const result = await CarService.updateCarIntoDbService(req.body.data);
 
+  emitMessage("update_car", {
+    message: `carId:${result.car._id.toString()} updated successfully`,
+  });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -101,6 +110,10 @@ const deleteCar: RequestHandler = catchAsync(async (req, res) => {
     await idConverter(vendor),
     "vendor"
   );
+  emitMessage("delete_car", {
+    message: `car has deleted successfully`,
+  });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,

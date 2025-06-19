@@ -18,7 +18,7 @@ const updateVendorService = async (payload: TVendorUpdate) => {
 
   Object.assign(foundVendor, updateData);
   foundVendor.save();
-  return { Vendor: foundVendor };
+  return { vendor: foundVendor };
 };
 
 const VendorServices = {

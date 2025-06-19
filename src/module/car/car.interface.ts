@@ -32,7 +32,7 @@ export interface ICar {
   fuelType: string[];
   gearType: string;
   bodyStyle: string[];
-  carImage: string;
+  carImage: string[];
   childSeat: IPriceOption;
   additionalDriver: IPriceOption;
   youngDriver: IPriceOption;
@@ -49,4 +49,4 @@ export interface ICarUpdate extends ICar {
   carId: Types.ObjectId;
 }
 
-export type TCarUpdate = Partial<ICar> & { carId: string, vendor: string }
+export type TCarUpdate = Partial<ICar> & { carId: string; vendor: string };

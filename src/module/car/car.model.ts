@@ -32,7 +32,7 @@ const CarSchema: Schema = new Schema<ICar>(
     fuelType: [{ type: String, required: true }],
     gearType: { type: String, required: true },
     bodyStyle: [{ type: String, required: true }],
-    carImage: { type: String, required: true },
+    carImage: [{ type: String, required: true }],
     childSeat: { type: PriceOptionSchema, required: true },
     additionalDriver: { type: PriceOptionSchema, required: true },
     youngDriver: { type: PriceOptionSchema, required: true },

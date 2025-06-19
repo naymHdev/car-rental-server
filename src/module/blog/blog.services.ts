@@ -1,8 +1,8 @@
-import httpStatus from 'http-status';
-import AppError from '../../app/error/AppError';
-import { IBlog, TBlogUpdate } from './blog.interface';
-import Blog from './blog.model';
-import { idConverter } from '../../utility/idConverter';
+import httpStatus from "http-status";
+import AppError from "../../app/error/AppError";
+import { IBlog, TBlogUpdate } from "./blog.interface";
+import Blog from "./blog.model";
+import { idConverter } from "../../utility/idConverter";
 // import { uploadFileToBunny } from '../../utility/bunny_cdn';
 
 // const createNewBlogIntoDb = async (req: RequestWithFiles) => {
@@ -65,16 +65,16 @@ import { idConverter } from '../../utility/idConverter';
 // };
 
 const createNewBlogIntoDb = async (payload: IBlog) => {
-    const { author } = payload
-    if (!author) {
-        throw new AppError(httpStatus.NOT_FOUND, "Author id is required")
-    }
-    const newCar = await Blog.create(payload)
-    if (!newCar) {
-        throw new AppError(httpStatus.NOT_FOUND, "New blog add failed")
-    }
-    return { car: newCar }
-}
+  const { author } = payload;
+  if (!author) {
+    throw new AppError(httpStatus.NOT_FOUND, "Author id is required");
+  }
+  const newBlog = await Blog.create(payload);
+  if (!newBlog) {
+    throw new AppError(httpStatus.NOT_FOUND, "New blog add failed");
+  }
+  return { blog: newBlog };
+};
 
 // const getAllBlogIntoDb = async (query: Record<string, unknown>) => {
 //     try {
@@ -214,70 +214,70 @@ const createNewBlogIntoDb = async (payload: IBlog) => {
 // }
 
 const updateBlogIntoDb = async (payload: TBlogUpdate) => {
-    const { blogId, author, ...updateData } = payload
-    const blogIdObject = await idConverter(blogId)
-    const authorIdObject = await idConverter(author)
+  const { blogId, author, ...updateData } = payload;
+  const blogIdObject = await idConverter(blogId);
+  const authorIdObject = await idConverter(author);
 
-    if (!blogIdObject || !authorIdObject) {
-        throw new AppError(httpStatus.NOT_FOUND, "Blog id & vendor id is required")
-    }
-    const foundBlog = await Blog.findById(blogIdObject)
-    if (!foundBlog) {
-        throw new AppError(httpStatus.NOT_FOUND, "No blog has found")
-    }
-    if (author !== foundBlog.author.toString()) {
-        throw new AppError(httpStatus.NOT_ACCEPTABLE, "Author does not this blog")
-    }
-    Object.assign(foundBlog, updateData)
-    foundBlog.save()
-    return { car: foundBlog }
-}
+  if (!blogIdObject || !authorIdObject) {
+    throw new AppError(httpStatus.NOT_FOUND, "Blog id & vendor id is required");
+  }
+  const foundBlog = await Blog.findById(blogIdObject);
+  if (!foundBlog) {
+    throw new AppError(httpStatus.NOT_FOUND, "No blog has found");
+  }
+  if (author !== foundBlog.author.toString()) {
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, "Author does not this blog");
+  }
+  Object.assign(foundBlog, updateData);
+  foundBlog.save();
+  return { bog: foundBlog };
+};
 
 const deleteBlogIntoDb = async (blogId: string) => {
-    if (!blogId) {
-        throw new AppError(httpStatus.NOT_FOUND, 'BlogId is required', '');
-    }
-    const blogIdObject = await idConverter(blogId);
-    const isExist = await Blog.findById(blogIdObject);
-    if (!isExist) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Blog not exist in database', '');
-    }
-    const deleteBlog = await Blog.deleteOne({
-        _id: blogIdObject,
-        isDeleted: { $ne: true },
-    });
-    if (deleteBlog.deletedCount === 0) {
-        throw new AppError(
-            httpStatus.NOT_FOUND,
-            'Blog not deleted yet from database',
-            '',
-        );
-    }
-    return { success: true, message: 'Blog deleted successfully' };
+  if (!blogId) {
+    throw new AppError(httpStatus.NOT_FOUND, "BlogId is required", "");
+  }
+  const blogIdObject = await idConverter(blogId);
+  const isExist = await Blog.findById(blogIdObject);
+  if (!isExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "Blog not exist in database", "");
+  }
+  const deleteBlog = await Blog.deleteOne({
+    _id: blogIdObject,
+    isDeleted: { $ne: true },
+  });
+  if (deleteBlog.deletedCount === 0) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Blog not deleted yet from database",
+      ""
+    );
+  }
+  return { success: true, message: "Blog deleted successfully" };
 };
 
 const deleteAllBlogIntoDb = async () => {
-    const blogs = await Blog.find();
-    if (!blogs || blogs.length === 0) {
-        throw new AppError(httpStatus.NOT_FOUND, 'No blog exist in database', '');
-    }
-    const deleteBlog = await Blog.deleteMany({ isDeleted: { $ne: true } });
-    if (deleteBlog.deletedCount === 0) {
-        throw new AppError(
-            httpStatus.NOT_FOUND,
-            'Blog not deleted yet from database',
-            '',
-        );
-    }
-    return { success: true, message: 'All blog deleted successfully' };
+  const blogs = await Blog.find();
+  if (!blogs || blogs.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, "No blog exist in database", "");
+  }
+  const deleteBlog = await Blog.deleteMany({ isDeleted: { $ne: true } });
+  if (deleteBlog.deletedCount === 0) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Blog not deleted yet from database",
+      ""
+    );
+  }
+  return { success: true, message: "All blog deleted successfully" };
 };
 
 const BlogServices = {
-    createNewBlogIntoDb,
-    // getAllBlogIntoDb,
-    updateBlogIntoDb,
-    deleteBlogIntoDb,
-    deleteAllBlogIntoDb,
+  createNewBlogIntoDb,
+  // getAllBlogIntoDb,
+  updateBlogIntoDb,
+  deleteBlogIntoDb,
+  deleteAllBlogIntoDb,
 };
 
 export default BlogServices;
