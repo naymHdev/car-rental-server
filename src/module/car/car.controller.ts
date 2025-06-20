@@ -11,16 +11,15 @@ import Car from "./car.model";
 import { emitMessage } from "../../utility/socket.helpers";
 
 const addNewCar: RequestHandler = catchAsync(async (req, res) => {
-  const { carId } = req.body.data;
-  console.log("carId: ", carId.toString());
+  const vendor = req.user._id;
+  console.log("vendor: ", vendor);
 
-  if (!carId) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Car ID is required", "");
+  if (!vendor) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Vendor ID is required", "");
   }
-  const result = await GenericService.findResources<ICar>(
-    Car,
-    await idConverter(carId)
-  );
+
+  req.body.data.vendor = await idConverter(vendor);
+  const result = await CarService.addNewCarIntoDbService(req.body.data);
   emitMessage("add_new_car", {
     message: "new car added",
   });

@@ -7,7 +7,7 @@ const VendorSchema = new Schema(
     companyName: {
       type: String,
       required: function (this: IVendor) {
-        return this.role === "Vendor";
+        return !this.sub;
       },
     },
   },
@@ -23,5 +23,5 @@ const VendorSchema = new Schema(
 const Vendor: Model<IVendor> = User.discriminator<IVendor>(
   "Vendor",
   VendorSchema
-); 
+);
 export default Vendor;

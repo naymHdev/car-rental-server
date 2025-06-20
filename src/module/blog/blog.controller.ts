@@ -18,6 +18,10 @@ const createNewBlog: RequestHandlerWithFiles = catchAsync(async (req, res) => {
     user: req.user,
     headers: req.headers,
   });
+  if (!req.user._id) {
+    throw new AppError(httpStatus.NOT_FOUND, "Author id is required");
+  }
+  req.body.data.author = req.user._id;
 
   const result = await BlogServices.createNewBlogIntoDb(req.body.data);
 

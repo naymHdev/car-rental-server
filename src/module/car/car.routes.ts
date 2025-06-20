@@ -17,13 +17,11 @@ router.post(
 
 router.get(
   "/get_car",
-  // validationRequest(AuthValidationSchema.playerSignUpValidation),
   CarController.findCar
 );
 
 router.get(
   "/get_all_car",
-  // validationRequest(AuthValidationSchema.playerSignUpValidation),
   CarController.findAllCar
 );
 

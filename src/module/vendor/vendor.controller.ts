@@ -12,7 +12,7 @@ import { emitMessage } from "../../utility/socket.helpers";
 
 const getVendor: RequestHandler = catchAsync(async (req, res) => {
   const { VendorId } = req.body.data;
-  console.log("carId: ", VendorId.toString());
+  console.log("carId: ", VendorId);
 
   if (!VendorId) {
     throw new AppError(httpStatus.BAD_REQUEST, "Vendor ID is required", "");

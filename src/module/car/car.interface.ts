@@ -1,18 +1,22 @@
 import { IUser } from "../user/user.interface";
 import { Types } from "mongoose";
 
+export enum GearType {
+  Manual = "Manual",
+  Automatic = "Automatic",
+}
 export interface IVendor extends IUser {
   companyName: string;
 }
 
-// export interface Rewards {
-//   code: string;
-//   reward: string;
-//   validity: string;
-// }
+export enum MileageType {
+  M = "M",
+  KM = "KM",
+}
+
 export interface IMileage {
   rate: number;
-  type: string;
+  type: MileageType;
 }
 export interface IPriceOption {
   select: number;
@@ -30,7 +34,7 @@ export interface ICar {
   vin: string;
   fuel: number;
   fuelType: string[];
-  gearType: string;
+  gearType: GearType;
   bodyStyle: string[];
   carImage: string[];
   childSeat: IPriceOption;
@@ -39,8 +43,8 @@ export interface ICar {
   oneWayFees: IPriceOption;
   gps: IPriceOption;
   crossBorder: IPriceOption;
-  draft: boolean;
-  published: boolean;
+  // draft: boolean;
+  published?: boolean;
   updatedAt: Date;
   isDeleted: boolean;
 }

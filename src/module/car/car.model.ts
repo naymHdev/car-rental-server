@@ -1,5 +1,5 @@
 import { model, Schema, Model } from "mongoose";
-import { ICar, IMileage, IPriceOption } from "./car.interface";
+import { GearType, ICar, IMileage, IPriceOption } from "./car.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
 
 const PriceOptionSchema = new Schema<IPriceOption>(
@@ -30,7 +30,7 @@ const CarSchema: Schema = new Schema<ICar>(
     vin: { type: String, required: true },
     fuel: { type: Number, required: true },
     fuelType: [{ type: String, required: true }],
-    gearType: { type: String, required: true },
+    gearType: { type: String, enum: Object.values(GearType), required: true },
     bodyStyle: [{ type: String, required: true }],
     carImage: [{ type: String, required: true }],
     childSeat: { type: PriceOptionSchema, required: true },
@@ -39,9 +39,8 @@ const CarSchema: Schema = new Schema<ICar>(
     oneWayFees: { type: PriceOptionSchema, required: true },
     gps: { type: PriceOptionSchema, required: true },
     crossBorder: { type: PriceOptionSchema, required: true },
-    draft: { type: Boolean, required: true },
+    // draft: { type: Boolean, required: true },
     published: { type: Boolean, required: true },
-    updatedAt: { type: Date, required: true },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }

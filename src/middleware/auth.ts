@@ -25,9 +25,10 @@ const auth = (...requireRoles: string[]) => {
 
     let decoded: UserPayload;
     try {
-      decoded = jwt.verify(token, config.jwt_access_secret as string) as
-        | UserPayload;
-
+      decoded = jwt.verify(
+        token,
+        config.jwt_access_secret as string
+      ) as UserPayload;
     } catch {
       throw new AppError(
         httpStatus.UNAUTHORIZED,

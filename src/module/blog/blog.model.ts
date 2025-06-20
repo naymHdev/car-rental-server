@@ -27,14 +27,6 @@ const BlogSchema: Schema = new Schema<IBlog>(
                 required: true,
             },
         ],
-        updatedAt: {
-            type: Date,
-            default: new Date(),
-        },
-        createdAt: {
-            type: Date,
-            default: new Date(),
-        },
         isDeleted: {
             type: Boolean,
             default: false,

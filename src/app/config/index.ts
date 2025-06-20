@@ -29,4 +29,7 @@ export default {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     bucket: process.env.AWS_S3_BUCKET_NAME,
   },
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY,
+  },
 };
