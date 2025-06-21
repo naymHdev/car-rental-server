@@ -24,6 +24,7 @@ const CarSchema: Schema = new Schema<ICar>(
     carName: { type: String, required: true },
     description: { type: String, required: true },
     model: { type: String, required: true },
+    price: { type: Number, required: true },
     mileage: { type: MileageSchema, required: true },
     seat: { type: Number, required: true },
     door: { type: Number, required: true },

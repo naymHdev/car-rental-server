@@ -1,15 +1,5 @@
 import { Types } from "mongoose";
-import { IUser } from "../user/user.interface";
 
-export interface IVendor extends IUser {
-  companyName: string;
-}
-
-// export interface Rewards {
-//   code: string;
-//   reward: string;
-//   validity: string;
-// }
 export interface IMileage {
   rate: number;
   type: string;
@@ -31,16 +21,22 @@ export interface AddExtra {
 export interface IOrder {
   carId: Types.ObjectId;
   userId: Types.ObjectId;
+  insuranceId?: Types.ObjectId;
   pickUp: Date;
   dropOff: Date;
   pickUpLocation: string;
   dropOffLocation: string;
   addExtra: AddExtra;
+  subTotal: number;
   discount: number;
+  total: number;
   status: "accept" | "cancel" | "complete" | "inProgress";
   updatedAt: Date;
+  createdAt: Date;
   isDeleted: boolean;
 }
+
+export type TOrder = Partial<IOrder>;
 
 export interface IOrderUPdate extends IOrder {
   orderId: Types.ObjectId;

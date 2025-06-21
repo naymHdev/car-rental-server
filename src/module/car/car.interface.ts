@@ -28,6 +28,7 @@ export interface ICar {
   carName: string;
   description: string;
   model: string;
+  price: number;
   mileage: IMileage;
   seat: number;
   door: number;
@@ -45,6 +46,7 @@ export interface ICar {
   crossBorder: IPriceOption;
   // draft: boolean;
   published?: boolean;
+  createdAt: Date;
   updatedAt: Date;
   isDeleted: boolean;
 }

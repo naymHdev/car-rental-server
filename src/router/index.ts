@@ -7,6 +7,7 @@ import UserRouter from "../module/user/user.routes";
 import VendorRouter from "../module/vendor/vendor.routes";
 import AdminRouter from "../module/admin/admin.routes";
 import ReviewRouter from "../module/review/review.routes";
+import InsuranceRouter from "../module/insurance/insurance.routes";
 
 const router = express.Router();
 
@@ -19,6 +20,8 @@ const moduleRoutes = [
   { path: "/car", route: CarRouter },
   { path: "/blog", route: BlogRouter },
   { path: "/review", route: ReviewRouter },
+  { path: "/order", route: ReviewRouter },
+  { path: "/insurance", route: InsuranceRouter },
 ];
 
 moduleRoutes.forEach((r) => router.use(r.path, r.route));
