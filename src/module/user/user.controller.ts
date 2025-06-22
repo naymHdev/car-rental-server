@@ -60,6 +60,7 @@ const updateUser: RequestHandler = catchAsync(async (req, res) => {
   emitMessage("update_user", {
     message: `userId:${result.user._id.toString()} updated successfully`,
   });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,

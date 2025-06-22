@@ -8,6 +8,7 @@ import VendorRouter from "../module/vendor/vendor.routes";
 import AdminRouter from "../module/admin/admin.routes";
 import ReviewRouter from "../module/review/review.routes";
 import InsuranceRouter from "../module/insurance/insurance.routes";
+import StripeRouter from "../module/stripe/stripe.routes";
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ const moduleRoutes = [
   { path: "/review", route: ReviewRouter },
   { path: "/order", route: ReviewRouter },
   { path: "/insurance", route: InsuranceRouter },
+  { path: "/payment", route: StripeRouter },
 ];
 
 moduleRoutes.forEach((r) => router.use(r.path, r.route));

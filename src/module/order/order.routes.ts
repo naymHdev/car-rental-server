@@ -1,6 +1,6 @@
 // src/modules/player/player.router.ts
 
-import express from 'express';
+import express from "express";
 // import validationRequest from '../../middleware/validationRequest';
 // import AuthValidationSchema from '../auth/auth.validation';
 // import AuthController from '../auth/auth.controller';
