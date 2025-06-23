@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { Server } from "http";
-import { Server as SocketIoServer } from "socket.io";
+import { Socket, Server as SocketIoServer } from "socket.io";
 import AppError from "../error/AppError";
 
 let io: SocketIoServer;
@@ -11,8 +11,17 @@ export const socketio = (server: Server) => {
       methods: ["GET", "POST"],
     },
   });
-  io.on("connection", (socket) => {
+  io.on("connection", (socket: Socket) => {
     console.log("Admin connected via Socket.IO:", socket.id);
+
+    socket.on("join", (id: string, admin?: boolean) => {
+      console.log(`userId: ${id} ready to receive notification`);
+      socket.join(id);
+
+      if (admin!) {
+        socket.join("Admin");
+      }
+    });
     socket.on("disconnect", () => {
       console.log(`Client disconnected: ${socket.id}`);
     });

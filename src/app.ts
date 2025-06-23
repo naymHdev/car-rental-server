@@ -13,6 +13,7 @@ import path from "path";
 
 const app = express();
 
+const allowedOrigins = ["192.168.56.1:3000", "*"];
 const httpServer = createServer(app);
 socketio(httpServer);
 
@@ -39,7 +40,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "production" ? config.domain! : "*",
+    // origin: process.env.NODE_ENV === "production" ? config.domain! : "*",
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   })
 );
 

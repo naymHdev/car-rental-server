@@ -258,7 +258,7 @@ const resetPasswordService = async (payload: TResetPassword) => {
     throw new AppError(httpStatus.NOT_FOUND, "Failed to reset password", "");
   }
 
-  return {user:updatedUser};
+  return { user: updatedUser };
 };
 
 const updatePasswordService = async (payload: TUpdatePassword) => {
@@ -296,7 +296,7 @@ const updatePasswordService = async (payload: TUpdatePassword) => {
     throw new AppError(httpStatus.NOT_FOUND, "Failed to update password", "");
   }
 
-  return {user:updatedUser};
+  return { user: updatedUser };
 };
 
 const AuthServices = {

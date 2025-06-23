@@ -57,7 +57,7 @@ const updateVendor: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.VendorId = VendorId;
   const result = await VendorServices.updateVendorService(req.body.data);
 
-  emitMessage("update_vendor", {
+  emitMessage(VendorId, "update_vendor", {
     message: `vendorId:${result.vendor._id.toString()} updated successfully`,
   });
 
@@ -86,7 +86,7 @@ const deleteVendor: RequestHandler = catchAsync(async (req, res) => {
     VendorId
   );
 
-  emitMessage("update_vendor", {
+  emitMessage(VendorId.toString(), "update_vendor", {
     message: `A vendor deleted successfully`,
   });
 

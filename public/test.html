@@ -8,17 +8,18 @@
   <body>
     <h1>testing socket</h1>
     <div id="message"></div>
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://localhost:8000/socket.io/socket.io.js"></script>
     <script>
       const socket = io();
       const message = document.getElementById("message");
 
-      socket.on("connect", (socket) => {
+      socket.on("connect", () => {
         console.log("User connected", socket.id);
+        socket.emit("join", "68469c2f3af1ab13c3710a61", true);
       });
 
-      socket.on("message", (socket) => {
-        message.innerText = socket;
+      socket.on("notification", (socket) => {
+        message.innerText = JSON.stringify(socket);
         console.log("socket:", socket);
       });
     </script>

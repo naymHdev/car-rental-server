@@ -4,7 +4,7 @@ import AuthServices from "./auth.services";
 import httpStatus from "http-status";
 import config from "../../app/config";
 import sendResponse from "../../utility/sendResponse";
-import { emitMessage } from "../../utility/socket.helpers";
+import { emitMessage, emitMessageToAdmin } from "../../utility/socket.helpers";
 
 const signUp: RequestHandler = catchAsync(async (req, res) => {
   const { role } = req.body.data;
@@ -15,7 +15,7 @@ const signUp: RequestHandler = catchAsync(async (req, res) => {
   const result = await AuthServices.signUpService(req.body.data);
   console.log("register: ", result);
 
-  emitMessage("signUp", {
+  emitMessageToAdmin("notification", {
     message: `Id:${result.signUp?._id.toString} signedup successfully`,
   });
   sendResponse(res, {
@@ -35,8 +35,8 @@ const login: RequestHandler = catchAsync(async (req, res) => {
     secure: config.NODE_ENV === "production",
     httpOnly: true,
   });
-  emitMessage("login", {
-    message: `Id:${result.user?._id.toString} login successfully`,
+  emitMessage(result.user?._id.toString() as string, "notification", {
+    message: `Id:${result.user?._id.toString()} login successfully`,
   });
   sendResponse(res, {
     success: true,
@@ -53,9 +53,9 @@ const requestForgotPassword: RequestHandler = catchAsync(async (req, res) => {
   const { email } = req.body.data || {};
   const result = await AuthServices.requestForgotPasswordService(email);
 
-  emitMessage("sent_otp", {
-    message: `On ${result.email} otp sent successfully`,
-  });
+  // emitMessage("sent_otp", {
+  //   message: `On ${result.email} otp sent successfully`,
+  // });
 
   sendResponse(res, {
     success: true,
@@ -68,9 +68,9 @@ const requestForgotPassword: RequestHandler = catchAsync(async (req, res) => {
 const verifyOtp: RequestHandler = catchAsync(async (req, res) => {
   const result = await AuthServices.verifyOtpService(req.body.data);
 
-  emitMessage("verify_otp", {
-    message: `On ${result.user._id} otp verified successfully`,
-  });
+  // emitMessage("verify_otp", {
+  //   message: `On ${result.user._id} otp verified successfully`,
+  // });
 
   sendResponse(res, {
     success: true,
@@ -82,9 +82,9 @@ const verifyOtp: RequestHandler = catchAsync(async (req, res) => {
 
 const resetPassword: RequestHandler = catchAsync(async (req, res) => {
   const result = await AuthServices.resetPasswordService(req.body.data);
-  emitMessage("reset_password", {
-    message: `User:${result.user._id.toString()} password reset successfully`,
-  });
+  // emitMessage("reset_password", {
+  //   message: `User:${result.user._id.toString()} password reset successfully`,
+  // });
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -94,9 +94,9 @@ const resetPassword: RequestHandler = catchAsync(async (req, res) => {
 });
 const updatePassword: RequestHandler = catchAsync(async (req, res) => {
   const result = await AuthServices.updatePasswordService(req.body.data);
-  emitMessage("update_password", {
-    message: `User:${result.user._id.toString()} password update successfully`,
-  });
+  // emitMessage("update_password", {
+  //   message: `User:${result.user._id.toString()} password update successfully`,
+  // });
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

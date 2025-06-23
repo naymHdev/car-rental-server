@@ -12,7 +12,7 @@ import { idConverter } from "../../utility/idConverter";
 
 const addReview: RequestHandler = catchAsync(async (req, res) => {
   const result = await ReviewServices.addReviewService(req.body.data);
-  emitMessage("add_new_review", {
+  emitMessage(result.review._id.toString()! as string, "add_new_review", {
     message: `new review added to ${req.body.data.orderId} from user:${req.body.data.userId}`,
   });
   sendResponse(res, {

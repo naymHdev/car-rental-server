@@ -11,10 +11,10 @@ import UserServices from "./user.services";
 import { emitMessage } from "../../utility/socket.helpers";
 
 const getUser: RequestHandler = catchAsync(async (req, res) => {
-  const { userId } = req.body.data;
-  console.log("carId: ", userId.toString());
+  const { userId } = req.query;
+  console.log("carId: ", userId!);
 
-  if (!userId) {
+  if (!userId || typeof userId !== "string") {
     throw new AppError(httpStatus.BAD_REQUEST, "User ID is required", "");
   }
   const result = await GenericService.findResources<IUser>(
@@ -57,7 +57,7 @@ const updateUser: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.userId = userId;
   const result = await UserServices.updateUserService(req.body.data);
 
-  emitMessage("update_user", {
+  emitMessage(userId, "update_user", {
     message: `userId:${result.user._id.toString()} updated successfully`,
   });
 
@@ -83,7 +83,7 @@ const deleteUser: RequestHandler = catchAsync(async (req, res) => {
   const userId = await idConverter(req.body.data.userId);
   const result = await GenericService.deleteResources<IUser>(User, userId);
 
-  emitMessage("delete_user", {
+  emitMessage(admin, "delete_user", {
     message: `A user deleted successfully`,
   });
 

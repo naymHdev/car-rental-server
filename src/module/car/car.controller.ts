@@ -20,7 +20,7 @@ const addNewCar: RequestHandler = catchAsync(async (req, res) => {
 
   req.body.data.vendor = await idConverter(vendor);
   const result = await CarService.addNewCarIntoDbService(req.body.data);
-  emitMessage("add_new_car", {
+  emitMessage(vendor, "add_new_car", {
     message: "new car added",
   });
   sendResponse(res, {
@@ -32,10 +32,10 @@ const addNewCar: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const findCar: RequestHandler = catchAsync(async (req, res) => {
-  const { carId } = req.body.data;
-  console.log("carId: ", carId.toString());
+  const { carId } = req.query;
+  console.log("carId: ", carId!);
 
-  if (!carId) {
+  if (!carId || typeof carId !== "string") {
     throw new AppError(httpStatus.BAD_REQUEST, "Car ID is required", "");
   }
   const result = await GenericService.findResources<ICar>(
@@ -79,7 +79,7 @@ const updateCar: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.vendor = vendor;
   const result = await CarService.updateCarIntoDbService(req.body.data);
 
-  emitMessage("update_car", {
+  emitMessage(vendor, "update_car", {
     message: `carId:${result.car._id.toString()} updated successfully`,
   });
 
@@ -109,7 +109,7 @@ const deleteCar: RequestHandler = catchAsync(async (req, res) => {
     await idConverter(vendor),
     "vendor"
   );
-  emitMessage("delete_car", {
+  emitMessage(vendor, "delete_car", {
     message: `car has deleted successfully`,
   });
 

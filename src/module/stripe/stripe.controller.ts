@@ -5,6 +5,7 @@ import AppError from "../../app/error/AppError";
 import StripeServices from "./stripe.service";
 import sendResponse from "../../utility/sendResponse";
 import { handleStripeWebhook } from "./stripe.webhook";
+import stripe from "../../app/config/stripe.config";
 
 const createPaymentIntent: RequestHandler = catchAsync(async (req, res) => {
   const { amount, currency } = req.body.data;
@@ -36,36 +37,39 @@ const webhook: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-import { Request, Response } from "express";
-import stripe from "../../app/config/stripe.config"; // your Stripe instance
+export const createCheckoutSession: RequestHandler = catchAsync(
+  async (req, res) => {
+    const { amount, orderId } = req.body.data;
 
-export const createCheckoutSession = async (req: Request, res: Response) => {
-  const { amount, orderId } = req.body;
-
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    payment_method_types: ["card", "paypal"], // Apple Pay is implicit
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          unit_amount: amount * 100, // amount in cents
-          product_data: {
-            name: "Car Rental Payment",
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card", "paypal"],
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            unit_amount: amount * 100,
+            product_data: {
+              name: "Car Rental Payment",
+            },
           },
+          quantity: 1,
         },
-        quantity: 1,
+      ],
+      metadata: {
+        orderId: orderId,
       },
-    ],
-    metadata: {
-      orderId: orderId,
-    },
-    success_url: "",
-    cancel_url: "",
-  });
-
-  res.status(200).json({ url: session.url });
-};
+      success_url: "",
+      cancel_url: "",
+    });
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "success",
+      data: { url: session.url },
+    });
+  }
+);
 
 const StripeController = {
   createPaymentIntent,

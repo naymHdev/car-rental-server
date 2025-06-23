@@ -6,7 +6,7 @@ import sendResponse from "../../utility/sendResponse";
 import GenericService from "../../utility/genericService.helpers";
 import { idConverter } from "../../utility/idConverter";
 import { IInsurance } from "./insurance.interface";
-import { emitMessage } from "../../utility/socket.helpers";
+import { emitMessageToAdmin } from "../../utility/socket.helpers";
 import Insurance from "./insurance.model";
 import InsuranceServices from "./insurance.services";
 
@@ -62,7 +62,7 @@ const updateInsurance: RequestHandler = catchAsync(async (req, res) => {
   }
   const result = await InsuranceServices.updateInsuranceService(req.body.data);
 
-  emitMessage("update_insurance", {
+  emitMessageToAdmin("update_insurance", {
     message: `vendorId:${result.insurance._id.toString()} updated successfully`,
   });
 
@@ -92,7 +92,7 @@ const deleteInsurance: RequestHandler = catchAsync(async (req, res) => {
     await idConverter(insuranceId)
   );
 
-  emitMessage("delete_insurance", {
+  emitMessageToAdmin("delete_insurance", {
     message: `A insurance deleted successfully`,
   });
 

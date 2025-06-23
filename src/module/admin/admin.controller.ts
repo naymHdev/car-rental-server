@@ -8,7 +8,7 @@ import { idConverter } from "../../utility/idConverter";
 import Admin from "./admin.model";
 import { IAdmin } from "./admin.interface";
 import AdminServices from "./admin.services";
-import { emitMessage } from "../../utility/socket.helpers";
+import { emitMessageToAdmin } from "../../utility/socket.helpers";
 
 const getAdmin: RequestHandler = catchAsync(async (req, res) => {
   const { adminId } = req.body.data;
@@ -41,7 +41,7 @@ const updateAdmin: RequestHandler = catchAsync(async (req, res) => {
   }
   req.body.data.adminId = adminId;
   const result = await AdminServices.updateAdminService(req.body.data);
-  emitMessage("upadate_admin", {
+  emitMessageToAdmin("upadate_admin", {
     message: `Admin:${result.Admin._id.toString()} updated successfully`,
   });
   sendResponse(res, {

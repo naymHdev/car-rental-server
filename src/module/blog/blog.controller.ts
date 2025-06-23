@@ -9,7 +9,6 @@ import GenericService from "../../utility/genericService.helpers";
 import { IBlog } from "./blog.interface";
 import Blog from "./blog.model";
 import { idConverter } from "../../utility/idConverter";
-import { emitMessage } from "../../utility/socket.helpers";
 
 const createNewBlog: RequestHandlerWithFiles = catchAsync(async (req, res) => {
   console.log("GameController.createNewGame - Inputs:", {
@@ -25,9 +24,9 @@ const createNewBlog: RequestHandlerWithFiles = catchAsync(async (req, res) => {
 
   const result = await BlogServices.createNewBlogIntoDb(req.body.data);
 
-  emitMessage("create_blog", {
-    message: `New blog uploaded successfully`,
-  });
+  // emitMessage("create_blog", {
+  //   message: `New blog uploaded successfully`,
+  // });
 
   sendResponse(res, {
     success: true,
@@ -82,9 +81,9 @@ const updateBlog: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.author = vendor;
   const result = await BlogServices.updateBlogIntoDb(req.body.data);
 
-  emitMessage("update_blog", {
-    message: `blogId:${result.bog._id.toString()} updated successfully`,
-  });
+  // emitMessage("update_blog", {
+  //   message: `blogId:${result.bog._id.toString()} updated successfully`,
+  // });
 
   sendResponse(res, {
     success: true,
@@ -116,9 +115,9 @@ const deleteBlog: RequestHandler = catchAsync(async (req, res) => {
     "author"
   );
 
-  emitMessage("delete_blog", {
-    message: `blog deleted successfully`,
-  });
+  // emitMessage("delete_blog", {
+  //   message: `blog deleted successfully`,
+  // });
 
   sendResponse(res, {
     success: true,
