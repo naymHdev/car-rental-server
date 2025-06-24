@@ -32,13 +32,16 @@ const findCarIntoDbService = async (carId: string) => {
 };
 
 const findAllCarIntoDbService = async (query: Record<string, unknown>) => {
+  const { minPrice, maxPrice, ...cQuery } = query;
+
   const baseQuery = Car.find().populate("vendor");
-  const allCarQuery = new QueryBuilder(baseQuery, query)
+  const allCarQuery = new QueryBuilder(baseQuery, cQuery)
     .search(["model", "fuelType"])
     .filter()
     .sort()
     .pagination()
-    .fields();
+    .fields()
+    .priceRange(Number(minPrice) || 0, Number(maxPrice) || Infinity);
 
   const cars = await allCarQuery.modelQuery;
   const meta = await allCarQuery.countTotal();

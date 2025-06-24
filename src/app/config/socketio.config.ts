@@ -12,19 +12,19 @@ export const socketio = (server: Server) => {
     },
   });
   io.on("connection", (socket: Socket) => {
-    console.log("Admin connected via Socket.IO:", socket.id);
+    // console.log("Admin connected via Socket.IO:", socket.id);
 
     socket.on("join", (id: string, admin?: boolean) => {
-      console.log(`userId: ${id} ready to receive notification`);
+      // console.log(`userId: ${id} ready to receive notification`);
       socket.join(id);
 
       if (admin) {
-        console.log("Admin connected via Socket.IO:", admin);
+        // console.log("Admin connected via Socket.IO:", admin);
         socket.join("Admin");
       }
     });
     socket.on("disconnect", () => {
-      console.log(`Client disconnected: ${socket.id}`);
+      // console.log(`Client disconnected: ${socket.id}`);
     });
   });
 };

@@ -61,11 +61,7 @@ const findCar: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const findAllCar: RequestHandler = catchAsync(async (req, res) => {
-  const result = await GenericService.findAllResources<ICar>(
-    Car,
-    req.query,
-    []
-  );
+  const result = await CarService.findAllCarIntoDbService(req.query);
 
   sendResponse(res, {
     success: true,
