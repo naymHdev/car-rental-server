@@ -8,7 +8,7 @@ import GenericService from "../../utility/genericService.helpers";
 import { idConverter } from "../../utility/idConverter";
 import { ICar } from "./car.interface";
 import Car from "./car.model";
-import { emitMessage } from "../../utility/socket.helpers";
+import NotificationServices from "../notification/notification.service";
 
 const addNewCar: RequestHandler = catchAsync(async (req, res) => {
   const vendor = req.user._id;
@@ -20,9 +20,18 @@ const addNewCar: RequestHandler = catchAsync(async (req, res) => {
 
   req.body.data.vendor = await idConverter(vendor);
   const result = await CarService.addNewCarIntoDbService(req.body.data);
-  emitMessage(vendor, "add_new_car", {
-    message: "new car added",
+
+  await NotificationServices.sendNoification({
+    ownerId: req.body.data.vendor,
+    key: "notification",
+    data: {
+      id: result.car?._id.toString(),
+      message: `New car added`,
+    },
+    receiverId: [req.body.data.vendor],
+    notifyAdmin: true,
   });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -79,14 +88,21 @@ const updateCar: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.vendor = vendor;
   const result = await CarService.updateCarIntoDbService(req.body.data);
 
-  emitMessage(vendor, "update_car", {
-    message: `carId:${result.car._id.toString()} updated successfully`,
+  await NotificationServices.sendNoification({
+    ownerId: req.body.data.vendor,
+    key: "notification",
+    data: {
+      id: result.car?._id.toString(),
+      message: `Car info updated`,
+    },
+    receiverId: [req.body.data.vendor],
+    notifyAdmin: true,
   });
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: "successfully updated car}",
+    message: "successfully updated car",
     data: result,
   });
 });
@@ -109,14 +125,21 @@ const deleteCar: RequestHandler = catchAsync(async (req, res) => {
     await idConverter(vendor),
     "vendor"
   );
-  emitMessage(vendor, "delete_car", {
-    message: `car has deleted successfully`,
+
+  await NotificationServices.sendNoification({
+    ownerId: req.body.data.vendor,
+    key: "notification",
+    data: {
+      message: `A car deleted`,
+    },
+    receiverId: [req.body.data.vendor],
+    notifyAdmin: true,
   });
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: "successfully deleted new car",
+    message: "successfully deleted a car",
     data: result,
   });
 });

@@ -9,6 +9,7 @@ import GenericService from "../../utility/genericService.helpers";
 import { IBlog } from "./blog.interface";
 import Blog from "./blog.model";
 import { idConverter } from "../../utility/idConverter";
+import NotificationServices from "../notification/notification.service";
 
 const createNewBlog: RequestHandlerWithFiles = catchAsync(async (req, res) => {
   console.log("GameController.createNewGame - Inputs:", {
@@ -24,9 +25,16 @@ const createNewBlog: RequestHandlerWithFiles = catchAsync(async (req, res) => {
 
   const result = await BlogServices.createNewBlogIntoDb(req.body.data);
 
-  // emitMessage("create_blog", {
-  //   message: `New blog uploaded successfully`,
-  // });
+  await NotificationServices.sendNoification({
+    ownerId: req.user?._id,
+    key: "notification",
+    data: {
+      id: result.blog?._id.toString(),
+      message: `New blog added`,
+    },
+    receiverId: [req.user?._id],
+    notifyAdmin: true,
+  });
 
   sendResponse(res, {
     success: true,
@@ -49,7 +57,7 @@ const getBlog: RequestHandler = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Successfully retrieved all blogs",
+    message: "Successfully retrieved blog",
     data: result,
   });
 });
@@ -81,9 +89,16 @@ const updateBlog: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.author = vendor;
   const result = await BlogServices.updateBlogIntoDb(req.body.data);
 
-  // emitMessage("update_blog", {
-  //   message: `blogId:${result.bog._id.toString()} updated successfully`,
-  // });
+  await NotificationServices.sendNoification({
+    ownerId: req.user?._id,
+    key: "notification",
+    data: {
+      id: result.blog?._id.toString(),
+      message: `A blog updated`,
+    },
+    receiverId: [req.user?._id],
+    notifyAdmin: true,
+  });
 
   sendResponse(res, {
     success: true,
@@ -115,77 +130,38 @@ const deleteBlog: RequestHandler = catchAsync(async (req, res) => {
     "author"
   );
 
-  // emitMessage("delete_blog", {
-  //   message: `blog deleted successfully`,
-  // });
+  await NotificationServices.sendNoification({
+    ownerId: req.user?._id,
+    key: "notification",
+    data: {
+      message: `A blog deleted`,
+    },
+    receiverId: [req.user?._id],
+    notifyAdmin: true,
+  });
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: "successfully deleted new car",
+    message: "successfully deleted a blog",
     data: result,
   });
 });
 
-// const updateBlog: RequestHandlerWithFiles = catchAsync(async (req, res) => {
-//   console.log('BlogController.createNewGame - Inputs:', {
-//     body: req.body.data,
-//     file: req.files,
-//     headers: req.headers,
-//   });
-
-//   const files = req.files as
-//     | { [fieldname: string]: Express.Multer.File[] }
-//     | undefined;
-
-//   const blogImageFile = files?.blogImage ? files.blogImage[0] : undefined;
-//   const result = await BlogServices.updateBlogIntoDb(
-//     req.body.data,
-//     blogImageFile,
-//   );
-//   sendResponse(res, {
-//     success: true,
-//     statusCode: httpStatus.OK,
-//     message: 'Blog updated perfectly',
-//     data: result,
-//   });
-// });
-
-// const deleteBlog: RequestHandler = catchAsync(async (req, res) => {
-//   console.log('BlogController.createNewGame - Inputs:', {
+// const deleteAllBlog: RequestHandler = catchAsync(async (req, res) => {
+//   console.log("BlogController.createNewGame - Inputs:", {
 //     body: req.body.data,
 //     headers: req.headers,
 //   });
-//   if (req.user.role !== 'SUPERADMIN') {
-//     throw new AppError(
-//       httpStatus.FORBIDDEN,
-//       'Only Super Admin can delet blog',
-//       '',
-//     );
-//   }
-//   const result = await BlogServices.deleteBlogIntoDb(req.body.data.blogId!);
+
+//   const result = await BlogServices.deleteAllBlogIntoDb();
 //   sendResponse(res, {
 //     success: true,
 //     statusCode: httpStatus.OK,
-//     message: 'Blog deleted perfectly',
+//     message: "All blogs deleted perfectly",
 //     data: result,
 //   });
 // });
-
-const deleteAllBlog: RequestHandler = catchAsync(async (req, res) => {
-  console.log("BlogController.createNewGame - Inputs:", {
-    body: req.body.data,
-    headers: req.headers,
-  });
-
-  const result = await BlogServices.deleteAllBlogIntoDb();
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "All blogs deleted perfectly",
-    data: result,
-  });
-});
 
 const BlogController = {
   createNewBlog,
@@ -193,7 +169,7 @@ const BlogController = {
   getAllBlog,
   updateBlog,
   deleteBlog,
-  deleteAllBlog,
+  // deleteAllBlog,
 };
 
 export default BlogController;

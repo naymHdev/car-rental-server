@@ -8,7 +8,7 @@ import { idConverter } from "../../utility/idConverter";
 import Admin from "./admin.model";
 import { IAdmin } from "./admin.interface";
 import AdminServices from "./admin.services";
-import { emitMessageToAdmin } from "../../utility/socket.helpers";
+import NotificationServices from "../notification/notification.service";
 
 const getAdmin: RequestHandler = catchAsync(async (req, res) => {
   const { adminId } = req.body.data;
@@ -21,6 +21,7 @@ const getAdmin: RequestHandler = catchAsync(async (req, res) => {
     Admin,
     await idConverter(adminId)
   );
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -41,9 +42,18 @@ const updateAdmin: RequestHandler = catchAsync(async (req, res) => {
   }
   req.body.data.adminId = adminId;
   const result = await AdminServices.updateAdminService(req.body.data);
-  emitMessageToAdmin("upadate_admin", {
-    message: `Admin:${result.Admin._id.toString()} updated successfully`,
+
+  await NotificationServices.sendNoification({
+    ownerId: req.user?._id,
+    key: "notification",
+    data: {
+      id: result.Admin._id.toString(),
+      message: `Admin profile updated`,
+    },
+    receiverId: [req.user?._id],
+    notifyAdmin: true,
   });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,

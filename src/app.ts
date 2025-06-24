@@ -2,7 +2,6 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import router from "./router";
 import helmet from "helmet";
-import config from "./app/config";
 import cookieParser from "cookie-parser";
 import notFound from "./middleware/notFound";
 import globalErrorHandler from "./middleware/globalErrorHandler";
@@ -12,9 +11,10 @@ import { socketio } from "./app/config/socketio.config";
 import path from "path";
 
 const app = express();
+// const allowedOrigins = ["http://192.168.56.1:3000", "*"];
+const allowedOrigins = ["*"];
 
-const allowedOrigins = ["192.168.56.1:3000", "*"];
-const httpServer = createServer(app);
+export const httpServer = createServer(app);
 socketio(httpServer);
 
 const rateLimiter = rateLimit({
@@ -30,8 +30,16 @@ const rateLimiter = rateLimit({
 
 app.use(express.static(path.resolve(__dirname, "../public/test.html")));
 
-app.use(helmet());
-
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "http://localhost:8000"],
+      },
+    },
+  })
+);
 app.use("/api", rateLimiter);
 
 app.use(cookieParser());

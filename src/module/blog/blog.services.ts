@@ -230,7 +230,7 @@ const updateBlogIntoDb = async (payload: TBlogUpdate) => {
   }
   Object.assign(foundBlog, updateData);
   foundBlog.save();
-  return { bog: foundBlog };
+  return { blog: foundBlog };
 };
 
 const deleteBlogIntoDb = async (blogId: string) => {

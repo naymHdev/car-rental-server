@@ -8,7 +8,7 @@ import User from "./user.model";
 import { IUser } from "./user.interface";
 import { idConverter } from "../../utility/idConverter";
 import UserServices from "./user.services";
-import { emitMessage } from "../../utility/socket.helpers";
+import NotificationServices from "../notification/notification.service";
 
 const getUser: RequestHandler = catchAsync(async (req, res) => {
   const { userId } = req.query;
@@ -57,8 +57,15 @@ const updateUser: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.userId = userId;
   const result = await UserServices.updateUserService(req.body.data);
 
-  emitMessage(userId, "update_user", {
-    message: `userId:${result.user._id.toString()} updated successfully`,
+  await NotificationServices.sendNoification({
+    ownerId: await idConverter(req.body.data.userId),
+    key: "notification",
+    data: {
+      id: userId,
+      message: `User updated`,
+    },
+    receiverId: [userId],
+    notifyAdmin: true,
   });
 
   sendResponse(res, {
@@ -83,10 +90,16 @@ const deleteUser: RequestHandler = catchAsync(async (req, res) => {
   const userId = await idConverter(req.body.data.userId);
   const result = await GenericService.deleteResources<IUser>(User, userId);
 
-  emitMessage(admin, "delete_user", {
-    message: `A user deleted successfully`,
+  await NotificationServices.sendNoification({
+    ownerId: await idConverter(req.body.data.userId),
+    key: "notification",
+    data: {
+      id: userId,
+      message: `User deleted`,
+    },
+    receiverId: [userId],
+    notifyAdmin: true,
   });
-
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,

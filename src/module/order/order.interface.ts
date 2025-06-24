@@ -41,3 +41,8 @@ export type TOrder = Partial<IOrder>;
 export interface IOrderUPdate extends IOrder {
   orderId: Types.ObjectId;
 }
+export type TOrderStatus = {
+  orderId: Types.ObjectId;
+  userId: Types.ObjectId;
+  status: "accept" | "cancel" | "complete" | "inProgress";
+};

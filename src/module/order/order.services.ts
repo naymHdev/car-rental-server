@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import AppError from "../../app/error/AppError";
-import { TOrder } from "./order.interface";
+import { TOrder, TOrderStatus } from "./order.interface";
 import Car from "../car/car.model";
 import { idConverter } from "../../utility/idConverter";
 import { dayCount } from "../../utility/dayCount.utils";
@@ -55,7 +55,7 @@ const createOrderServices = async (payload: TOrder) => {
   if (addExtra.crossBorder)
     addOnTotal += car.crossBorder.price * car.crossBorder.select;
 
-  // 🛡 Insurance check
+  // Insurance check
   if (addExtra.insurance && !insuranceId) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -78,10 +78,29 @@ const createOrderServices = async (payload: TOrder) => {
   if (!newOrder) {
     throw new AppError(httpStatus.BAD_REQUEST, "Order not placed yet");
   }
-  return { order: newOrder };
+  return { order: newOrder, car: car };
+};
+
+const orderStatuaServices = async (payload: TOrderStatus) => {
+  const { orderId, userId, ...restData } = payload;
+
+  if (!orderId || !userId) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Missing orderId/userid fields");
+  }
+
+  const foundOrder = await Order.findById(await idConverter(orderId));
+  if (!foundOrder) {
+    throw new AppError(httpStatus.NOT_FOUND, "Order not found");
+  }
+
+  Object.assign(foundOrder, restData);
+  foundOrder.save();
+
+  return { order: foundOrder };
 };
 
 const OrderServices = {
   createOrderServices,
+  orderStatuaServices,
 };
 export default OrderServices;

@@ -18,7 +18,8 @@ export const socketio = (server: Server) => {
       console.log(`userId: ${id} ready to receive notification`);
       socket.join(id);
 
-      if (admin!) {
+      if (admin) {
+        console.log("Admin connected via Socket.IO:", admin);
         socket.join("Admin");
       }
     });
@@ -28,7 +29,7 @@ export const socketio = (server: Server) => {
   });
 };
 
-export const socket = (): SocketIoServer => {
+export const socket = () => {
   if (!io) {
     throw new AppError(httpStatus.NOT_FOUND, "Socket id not found");
   }

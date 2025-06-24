@@ -4,7 +4,8 @@ import AuthServices from "./auth.services";
 import httpStatus from "http-status";
 import config from "../../app/config";
 import sendResponse from "../../utility/sendResponse";
-import { emitMessage, emitMessageToAdmin } from "../../utility/socket.helpers";
+import NotificationServices from "../notification/notification.service";
+import AppError from "../../app/error/AppError";
 
 const signUp: RequestHandler = catchAsync(async (req, res) => {
   const { role } = req.body.data;
@@ -14,10 +15,20 @@ const signUp: RequestHandler = catchAsync(async (req, res) => {
   // }
   const result = await AuthServices.signUpService(req.body.data);
   console.log("register: ", result);
-
-  emitMessageToAdmin("notification", {
-    message: `Id:${result.signUp?._id.toString} signedup successfully`,
+  if (!result.signUp || !result.signUp._id) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not found");
+  }
+  await NotificationServices.sendNoification({
+    ownerId: result.signUp._id!,
+    key: "notification",
+    data: {
+      id: result.signUp?._id.toString(),
+      message: `New user register`,
+    },
+    receiverId: [result.signUp._id],
+    notifyAdmin: true,
   });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -35,9 +46,22 @@ const login: RequestHandler = catchAsync(async (req, res) => {
     secure: config.NODE_ENV === "production",
     httpOnly: true,
   });
-  emitMessage(result.user?._id.toString() as string, "notification", {
-    message: `Id:${result.user?._id.toString()} login successfully`,
+
+  if (!user || !user._id) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not found");
+  }
+
+  await NotificationServices.sendNoification({
+    ownerId: user._id,
+    key: "notification",
+    data: {
+      id: result.user?._id.toString(),
+      message: `User/vendor login`,
+    },
+    receiverId: [user._id],
+    notifyAdmin: true,
   });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -53,10 +77,6 @@ const requestForgotPassword: RequestHandler = catchAsync(async (req, res) => {
   const { email } = req.body.data || {};
   const result = await AuthServices.requestForgotPasswordService(email);
 
-  // emitMessage("sent_otp", {
-  //   message: `On ${result.email} otp sent successfully`,
-  // });
-
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -68,10 +88,6 @@ const requestForgotPassword: RequestHandler = catchAsync(async (req, res) => {
 const verifyOtp: RequestHandler = catchAsync(async (req, res) => {
   const result = await AuthServices.verifyOtpService(req.body.data);
 
-  // emitMessage("verify_otp", {
-  //   message: `On ${result.user._id} otp verified successfully`,
-  // });
-
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -82,21 +98,35 @@ const verifyOtp: RequestHandler = catchAsync(async (req, res) => {
 
 const resetPassword: RequestHandler = catchAsync(async (req, res) => {
   const result = await AuthServices.resetPasswordService(req.body.data);
-  // emitMessage("reset_password", {
-  //   message: `User:${result.user._id.toString()} password reset successfully`,
-  // });
+  await NotificationServices.sendNoification({
+    ownerId: req.user?._id,
+    key: "notification",
+    data: {
+      id: result.user._id.toString(),
+      message: `Password reset`,
+    },
+    receiverId: [req.user?._id],
+    notifyAdmin: true,
+  });
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Password updated successfully",
+    message: "Password reset successfully",
     data: result,
   });
 });
 const updatePassword: RequestHandler = catchAsync(async (req, res) => {
   const result = await AuthServices.updatePasswordService(req.body.data);
-  // emitMessage("update_password", {
-  //   message: `User:${result.user._id.toString()} password update successfully`,
-  // });
+  await NotificationServices.sendNoification({
+    ownerId: req.user?._id,
+    key: "notification",
+    data: {
+      id: result.user._id.toString(),
+      message: `Password updated`,
+    },
+    receiverId: [req.user?._id],
+    notifyAdmin: true,
+  });
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

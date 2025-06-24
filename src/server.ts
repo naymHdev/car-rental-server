@@ -1,14 +1,14 @@
 import { Server } from "http";
 import { dbConnection, registerDBEventListener } from "./app/config/db.config";
 import config from "./app/config";
-import app from "./app";
 import mongoose from "mongoose";
 import { testS3 } from "./app/config/s3Bucket.config";
+import { httpServer } from "./app";
 
 let server: Server;
 
 const startServer = async () => {
-  server = app.listen(config.port, () => {
+  server = httpServer.listen(config.port, () => {
     console.log(` 🚀 Server is running at http://localhost:${config.port}`);
   });
 };

@@ -2,18 +2,26 @@ import httpStatus from "http-status";
 import { RequestHandler } from "express";
 import catchAsync from "../../utility/catchAsync";
 import sendResponse from "../../utility/sendResponse";
-import { emitMessage } from "../../utility/socket.helpers";
 import ReviewServices from "./review.services";
 import GenericService from "../../utility/genericService.helpers";
 import Review from "./review.model";
 import { IReview } from "./review.interface";
 import AppError from "../../app/error/AppError";
 import { idConverter } from "../../utility/idConverter";
+import NotificationServices from "../notification/notification.service";
 
 const addReview: RequestHandler = catchAsync(async (req, res) => {
   const result = await ReviewServices.addReviewService(req.body.data);
-  emitMessage(result.review._id.toString()! as string, "add_new_review", {
-    message: `new review added to ${req.body.data.orderId} from user:${req.body.data.userId}`,
+
+  await NotificationServices.sendNoification({
+    ownerId: await idConverter(req.body.data.userId),
+    key: "notification",
+    data: {
+      id: result.review?._id.toString(),
+      message: `Add new review`,
+    },
+    receiverId: [await idConverter(req.body.data.userId)],
+    notifyAdmin: true,
   });
   sendResponse(res, {
     success: true,
@@ -32,9 +40,7 @@ const findReview: RequestHandler = catchAsync(async (req, res) => {
     Review,
     await idConverter(reviewId)
   );
-  //   emitMessage("add_new_review", {
-  //     message: `new review added to ${req.body.data.orderId} from user:${req.body.data.userId}`,
-  //   });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -48,9 +54,7 @@ const findAllReview: RequestHandler = catchAsync(async (req, res) => {
     req.query,
     ["userId", "orderId"]
   );
-  //   emitMessage("add_new_review", {
-  //     message: `new review added to ${req.body.data.orderId} from user:${req.body.data.userId}`,
-  //   });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,

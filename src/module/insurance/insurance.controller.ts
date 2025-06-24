@@ -6,22 +6,34 @@ import sendResponse from "../../utility/sendResponse";
 import GenericService from "../../utility/genericService.helpers";
 import { idConverter } from "../../utility/idConverter";
 import { IInsurance } from "./insurance.interface";
-import { emitMessageToAdmin } from "../../utility/socket.helpers";
 import Insurance from "./insurance.model";
 import InsuranceServices from "./insurance.services";
+import NotificationServices from "../notification/notification.service";
 
 const createInsurance: RequestHandler = catchAsync(async (req, res) => {
   if (req.user?.role !== "Admin") {
     throw new AppError(httpStatus.BAD_REQUEST, "Insurance ID is required", "");
   }
   const result = await InsuranceServices.createInsuranceService(req.body.data);
+
+  await NotificationServices.sendNoification({
+    ownerId: req.user?._id,
+    key: "notification",
+    data: {
+      id: result.insurance?._id.toString(),
+      message: `New insurance added`,
+    },
+    receiverId: [req.user?._id],
+  });
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: "successfully retrieve insurance data",
+    message: "successfully added new insurance",
     data: result,
   });
 });
+
 const getInsurance: RequestHandler = catchAsync(async (req, res) => {
   const { insuranceId } = req.body.data;
   console.log("insuranceId: ", insuranceId);
@@ -36,7 +48,7 @@ const getInsurance: RequestHandler = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: "successfully retrieve insurance data",
+    message: "successfully retrieve all insurance data",
     data: result,
   });
 });
@@ -51,7 +63,7 @@ const getAllInsurance: RequestHandler = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: "successfully retrieve Insurance",
+    message: "successfully retrieve Insurance data",
     data: result,
   });
 });
@@ -62,8 +74,14 @@ const updateInsurance: RequestHandler = catchAsync(async (req, res) => {
   }
   const result = await InsuranceServices.updateInsuranceService(req.body.data);
 
-  emitMessageToAdmin("update_insurance", {
-    message: `vendorId:${result.insurance._id.toString()} updated successfully`,
+  await NotificationServices.sendNoification({
+    ownerId: req.user?._id,
+    key: "notification",
+    data: {
+      id: result.insurance?._id.toString(),
+      message: `An insurance updated`,
+    },
+    receiverId: [req.user?._id],
   });
 
   sendResponse(res, {
@@ -92,8 +110,13 @@ const deleteInsurance: RequestHandler = catchAsync(async (req, res) => {
     await idConverter(insuranceId)
   );
 
-  emitMessageToAdmin("delete_insurance", {
-    message: `A insurance deleted successfully`,
+  await NotificationServices.sendNoification({
+    ownerId: req.user?._id,
+    key: "notification",
+    data: {
+      message: `An insurance deleted`,
+    },
+    receiverId: [req.user?._id],
   });
 
   sendResponse(res, {

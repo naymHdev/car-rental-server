@@ -4,9 +4,7 @@ export interface INotification {
   key: string;
   data: object;
   receiverId: Types.ObjectId[];
-  notifyAdmin: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  notifyAdmin?: boolean;
 }
 
 export type TNotification = Partial<INotification> & {

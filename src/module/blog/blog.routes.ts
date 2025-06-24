@@ -45,7 +45,7 @@ router.delete(
   BlogController.deleteBlog
 );
 
-router.delete("/delete-all-blog", BlogController.deleteAllBlog);
+// router.delete("/delete-all-blog", BlogController.deleteAllBlog);
 
 const BlogRouter = router;
 export default BlogRouter;

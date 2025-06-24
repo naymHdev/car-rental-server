@@ -6,6 +6,8 @@ import StripeServices from "./stripe.service";
 import sendResponse from "../../utility/sendResponse";
 import { handleStripeWebhook } from "./stripe.webhook";
 import stripe from "../../app/config/stripe.config";
+import NotificationServices from "../notification/notification.service";
+import { idConverter } from "../../utility/idConverter";
 
 const createPaymentIntent: RequestHandler = catchAsync(async (req, res) => {
   const { amount, currency } = req.body.data;
@@ -16,10 +18,20 @@ const createPaymentIntent: RequestHandler = catchAsync(async (req, res) => {
     );
   }
   const result = await StripeServices.createPaymentIntentService(req.body.data);
+
+  await NotificationServices.sendNoification({
+    ownerId: await idConverter(req.body.data.userId),
+    key: "notification",
+    data: {
+      message: `Payment done`,
+    },
+    receiverId: [await idConverter(req.body.data.userId)],
+    notifyAdmin: true,
+  });
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: "successfully retrieve user data",
+    message: "successfully payment complete",
     data: result,
   });
 });
