@@ -73,7 +73,7 @@ const findAllCar: RequestHandler = catchAsync(async (req, res) => {
 
 const updateCar: RequestHandler = catchAsync(async (req, res) => {
   if (!req.user) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "User not authenticated", "");
+    throw new AppError(httpStatus.UNAUTHORIZED, "You are not authenticated", "");
   }
   const vendor = req.user?._id;
   console.log("userId: ", vendor.toString());

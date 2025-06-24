@@ -11,7 +11,6 @@ router.post(
   auth("Vendor"),
   upload.fields([{ name: "carImage", maxCount: 5 }]),
   fileHandle("carImage"),
-  // validationRequest(AuthValidationSchema.playerSignUpValidation),
   CarController.addNewCar
 );
 
@@ -30,14 +29,12 @@ router.patch(
   auth("Vendor"),
   upload.fields([{ name: "carImage", maxCount: 5 }]),
   fileHandle("carImage"),
-  // validationRequest(AuthValidationSchema.playerSignUpValidation),
   CarController.updateCar
 );
 
 router.delete(
   "/delete_car",
   auth("Vendor"),
-  // validationRequest(AuthValidationSchema.playerSignUpValidation),
   CarController.deleteCar
 );
 

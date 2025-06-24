@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
-import { IOtp } from "./auth.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
+import { IOtp } from "./auth.interface";
 
 const OtpSchema = new Schema<IOtp>(
   {

@@ -3,6 +3,14 @@ import { TRole } from "../../types/express";
 
 export const Role = ["User", "Vendor", "Admin"] as const;
 
+export interface ILocation {
+  country: string;
+  state: string;
+  city: string;
+  streetAddress: string;
+  zipCode: string;
+}
+
 // export interface IAuthProvider extends Document {
 //   sub: string;
 //   authProviderName: string;
@@ -20,7 +28,7 @@ export interface ISignup extends ISignIn {
   lastName?: string;
   userName?: string;
   mobile?: string;
-  location?: string;
+  location?: ILocation;
   photo: string;
   role: TRole;
   agreeTcp: boolean;

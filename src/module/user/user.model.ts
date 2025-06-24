@@ -1,7 +1,15 @@
 import { model, Model, Schema } from "mongoose";
 import { IUser } from "./user.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
-import { Role } from "../auth/auth.interface";
+import { ILocation, Role } from "../auth/auth.interface";
+
+export const LocationSchema = new Schema<ILocation>({
+  country: { type: String, required: false },
+  state: { type: String, required: false },
+  city: { type: String, required: false },
+  streetAddress: { type: String, required: false },
+  zipCode: { type: String, required: false },
+});
 
 // Helpers
 const isRequiredForManual = function (this: IUser): boolean {
@@ -44,7 +52,7 @@ export const UserSchema: Schema = new Schema<IUser>(
       required: isRequiredForManual,
     },
     location: {
-      type: String,
+      type: LocationSchema,
       required: isRequiredForManual,
     },
     email: {
