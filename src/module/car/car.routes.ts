@@ -14,15 +14,9 @@ router.post(
   CarController.addNewCar
 );
 
-router.get(
-  "/get_car",
-  CarController.findCar
-);
+router.get("/car-details/:id", CarController.findCar);
 
-router.get(
-  "/get_all_car",
-  CarController.findAllCar
-);
+router.get("/get_all_car", CarController.findAllCar);
 
 router.patch(
   "/update_car",
@@ -32,11 +26,9 @@ router.patch(
   CarController.updateCar
 );
 
-router.delete(
-  "/delete_car",
-  auth("Vendor"),
-  CarController.deleteCar
-);
+router.delete("/delete_car", auth("Vendor"), CarController.deleteCar);
+
+router.get("/locations", CarController.getAllLocations);
 
 const CarRouter = router;
 export default CarRouter;

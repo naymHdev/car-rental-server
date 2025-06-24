@@ -21,10 +21,7 @@ const addNewCarIntoDbService = async (payload: ICar) => {
 
 const findCarIntoDbService = async (carId: string) => {
   const carIdObject = await idConverter(carId);
-  if (!carIdObject) {
-    throw new AppError(httpStatus.NOT_FOUND, "Vendor id is required");
-  }
-  const foundCar = await Car.findById(carIdObject);
+  const foundCar = await Car.findById(carIdObject).populate("vendor");
   if (!foundCar) {
     throw new AppError(httpStatus.NOT_FOUND, "No car has found");
   }
@@ -96,12 +93,19 @@ const deleteCarIntoDbService = async (carId: string, vendor: string) => {
   return { message: `Car with ID ${carId} deleted successfully` };
 };
 
+//  --------- Get Only Locations ----------
+const getAllLocations = async () => {
+  const locations = await Car.distinct("rentingLocation");
+  return { locations };
+};
+
 const CarService = {
   addNewCarIntoDbService,
   findCarIntoDbService,
   findAllCarIntoDbService,
   updateCarIntoDbService,
   deleteCarIntoDbService,
+  getAllLocations,
 };
 
 export default CarService;

@@ -41,16 +41,8 @@ const addNewCar: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const findCar: RequestHandler = catchAsync(async (req, res) => {
-  const { carId } = req.query;
-  console.log("carId: ", carId!);
-
-  if (!carId || typeof carId !== "string") {
-    throw new AppError(httpStatus.BAD_REQUEST, "Car ID is required", "");
-  }
-  const result = await GenericService.findResources<ICar>(
-    Car,
-    await idConverter(carId)
-  );
+  const { id } = req.params;
+  const result = await CarService.findCarIntoDbService(id);
 
   sendResponse(res, {
     success: true,
@@ -73,7 +65,11 @@ const findAllCar: RequestHandler = catchAsync(async (req, res) => {
 
 const updateCar: RequestHandler = catchAsync(async (req, res) => {
   if (!req.user) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "You are not authenticated", "");
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "You are not authenticated",
+      ""
+    );
   }
   const vendor = req.user?._id;
   console.log("userId: ", vendor.toString());
@@ -140,12 +136,23 @@ const deleteCar: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const getAllLocations = catchAsync(async (req, res) => {
+  const result = await CarService.getAllLocations();
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "successfully retrieve locations data",
+    data: result,
+  });
+});
+
 const CarController = {
   addNewCar,
   findCar,
   findAllCar,
   updateCar,
   deleteCar,
+  getAllLocations,
 };
 
 export default CarController;

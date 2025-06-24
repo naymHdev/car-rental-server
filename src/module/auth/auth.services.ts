@@ -15,34 +15,6 @@ import User from "../user/user.model";
 import { TResetPassword, TUpdatePassword, TVerifyOtp } from "./auth.constant";
 import Otp from "./auth.model";
 
-// const signUpService = async (payload: ISignup) => {
-//   console.log("signUpService:", payload);
-//   const { email, role } = payload;
-//   const QueryModel = getRoleModels(role);
-//   const existing = await QueryModel?.findOne({ email });
-//   if (existing) {
-//     const existingSub =
-//       existing.authProvider?.map((provider: IAuthProvider) => provider.sub) ||
-//       [];
-//     const isProviderExist = authProvider?.some((newProvider) =>
-//       existingSub.includes(newProvider.sub)
-//     );
-//     if (isProviderExist) {
-//       throw new AppError(
-//         httpStatus.CONFLICT,
-//         "Email already registered. Please, signin...",
-//         ""
-//       );
-//     }
-//     existing.authProvider?.push(...(authProvider || []));
-//     await existing.save();
-//     return existing;
-//   }
-//   const newUser = await QueryModel?.create({ payload });
-
-//   return await QueryModel?.findById(newUser?._id).select("-password");
-// };
-
 const signUpService = async (payload: ISignup) => {
   // console.log("signUpService:", payload);
 
@@ -62,37 +34,6 @@ const signUpService = async (payload: ISignup) => {
       ""
     );
   }
-
-  // if (existing) {
-  //   if (role !== "Admin") {
-  //     throw new AppError(
-  //       httpStatus.CONFLICT,
-  //       "Email already registered. Please, signin...",
-  //       ""
-  //     );
-  //   } else {
-  //     if (payload.password && role === "Admin") {
-  //       const login = await loginService({
-  //         email: email,
-  //         password: payload.password,
-  //       });
-  //       return login;
-  //     }
-  //   }
-  // }
-
-  // if (existing && existing?.sub && (existing?.sub === sub)) {
-  //   throw new AppError(
-  //     httpStatus.CONFLICT,
-  //     "Email already registered. Please, signin...",
-  //     ""
-  //   );
-  // }
-
-  // let newUser;
-  // if (payload.sub && payload.authProviderName) {
-  //   newUser = await QueryModel?.create({ sub, email, role, authProviderName })
-  // }
 
   const newUser = await QueryModel?.create(payload);
 

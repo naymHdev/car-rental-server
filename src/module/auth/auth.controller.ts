@@ -10,11 +10,13 @@ import AppError from "../../app/error/AppError";
 const signUp: RequestHandler = catchAsync(async (req, res) => {
   const { role } = req.body.data;
 
+
   // if (!email || !password) {
   //   throw new AppError(httpStatus.BAD_REQUEST, "Missing required fields", "");
   // }
   const result = await AuthServices.signUpService(req.body.data);
-  console.log("register: ", result);
+  // console.log("register: ", result);
+
   if (!result.signUp || !result.signUp._id) {
     throw new AppError(httpStatus.UNAUTHORIZED, "User not found");
   }

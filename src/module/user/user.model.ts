@@ -3,13 +3,16 @@ import { IUser } from "./user.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
 import { ILocation, Role } from "../auth/auth.interface";
 
-export const LocationSchema = new Schema<ILocation>({
-  country: { type: String, required: false },
-  state: { type: String, required: false },
-  city: { type: String, required: false },
-  streetAddress: { type: String, required: false },
-  zipCode: { type: String, required: false },
-});
+export const LocationSchema = new Schema<ILocation>(
+  {
+    country: { type: String, required: true, trim: true },
+    state: { type: String, required: true, trim: true },
+    city: { type: String, required: true, trim: true },
+    streetAddress: { type: String, required: true, trim: true },
+    zipCode: { type: String, required: true, trim: true },
+  },
+  { _id: false }
+);
 
 // Helpers
 const isRequiredForManual = function (this: IUser): boolean {
@@ -29,7 +32,7 @@ export const UserSchema: Schema = new Schema<IUser>(
     },
     authProviderName: {
       type: String,
-      required: isRequiredForSocial,
+      required: false,
     },
     firstName: {
       type: String,
@@ -53,7 +56,7 @@ export const UserSchema: Schema = new Schema<IUser>(
     },
     location: {
       type: LocationSchema,
-      required: isRequiredForManual,
+      required: true,
     },
     email: {
       type: String,

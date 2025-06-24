@@ -25,7 +25,7 @@ const findAllResources = async <T>(
   Query: Record<string, unknown>,
   searchField: string[]
 ) => {
-  console.log("Query:", Query);
+  // console.log("Query:", Query);
 
   const baseQuery = Model.find();
   const queryBuilder = new QueryBuilder(baseQuery, Query)

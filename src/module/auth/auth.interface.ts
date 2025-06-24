@@ -34,6 +34,8 @@ export interface ISignup extends ISignIn {
   agreeTcp: boolean;
 }
 
+
+
 export interface IOtp {
   userId: Types.ObjectId;
   email: string;
