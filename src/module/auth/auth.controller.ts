@@ -39,7 +39,7 @@ const signUp: RequestHandler = catchAsync(async (req, res) => {
 
 const login: RequestHandler = catchAsync(async (req, res) => {
   const result = await AuthServices.loginService(req.body.data);
-  console.log(req.body.data!);
+  // console.log(req.body.data!);
 
   const { refreshToken, accessToken, user } = result;
   res.cookie("refreshToken", refreshToken, {

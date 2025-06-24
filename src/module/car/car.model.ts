@@ -23,6 +23,8 @@ const CarSchema: Schema = new Schema<ICar>(
     vendor: { type: Schema.Types.ObjectId, ref: "Vendor", required: true },
     carName: { type: String, required: true },
     description: { type: String, required: true },
+    rentingLocation: { type: String, required: true },
+    carAmenities: { type: [String], required: true },
     model: { type: String, required: true },
     price: { type: Number, required: true },
     mileage: { type: MileageSchema, required: true },

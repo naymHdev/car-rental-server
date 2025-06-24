@@ -36,7 +36,7 @@ const findAllCarIntoDbService = async (query: Record<string, unknown>) => {
 
   const baseQuery = Car.find().populate("vendor");
   const allCarQuery = new QueryBuilder(baseQuery, cQuery)
-    .search(["model", "fuelType"])
+    .search(["model", "fuelType", "rentingLocation"])
     .filter()
     .sort()
     .pagination()

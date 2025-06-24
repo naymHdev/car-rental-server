@@ -27,6 +27,8 @@ export interface ICar {
   vendor: Types.ObjectId;
   carName: string;
   description: string;
+  rentingLocation: string;
+  carAmenities: string[];
   model: string;
   price: number;
   mileage: IMileage;

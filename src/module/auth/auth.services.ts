@@ -44,7 +44,7 @@ import Otp from "./auth.model";
 // };
 
 const signUpService = async (payload: ISignup) => {
-  console.log("signUpService:", payload);
+  // console.log("signUpService:", payload);
 
   const { email, role } = payload;
   const QueryModel = getRoleModels(role);
@@ -101,7 +101,7 @@ const signUpService = async (payload: ISignup) => {
 };
 
 const loginService = async (payload: ISignIn) => {
-  console.log(payload);
+  // console.log(payload);
   const QueryModel: Model<IUser | IVendor | IAdmin> = User;
   const query: Record<string, unknown> = { email: payload.email };
   if (payload.sub) {
@@ -157,7 +157,7 @@ const loginService = async (payload: ISignIn) => {
 };
 
 const requestForgotPasswordService = async (email: string) => {
-  console.log("email: ", email);
+  // console.log("email: ", email);
 
   if (!emailRegex.test(email)) {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid email format", "");
@@ -235,7 +235,7 @@ const verifyOtpService = async (payload: TVerifyOtp) => {
 
 const resetPasswordService = async (payload: TResetPassword) => {
   const { userId, newPassword } = payload;
-  console.log(userId);
+  // console.log(userId);
 
   const userIdObject = await idConverter(userId!);
   const QueryModel: Model<IUser | IVendor | IAdmin> = User;
@@ -263,7 +263,7 @@ const resetPasswordService = async (payload: TResetPassword) => {
 
 const updatePasswordService = async (payload: TUpdatePassword) => {
   const { userId, password, newPassword } = payload;
-  console.log(userId);
+  // console.log(userId);
 
   const userIdObject = await idConverter(userId!);
   const QueryModel: Model<IUser | IVendor | IAdmin> = User;
