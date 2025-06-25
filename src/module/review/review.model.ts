@@ -1,27 +1,28 @@
 import { model, Schema, Model } from "mongoose";
 import { IReview } from "./review.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
-const isRequired = function (this: IReview): boolean {
-  return !!this.comment;
-};
 
 const ReviewSchema: Schema = new Schema<IReview>(
   {
+    carId: {
+      type: Schema.Types.ObjectId,
+      ref: "Car",
+      required: true,
+    },
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
+
     orderId: {
-      type: Schema.Types.ObjectId,
+      type: String,
       ref: "Order",
       required: true,
     },
     price: {
       type: Number,
       required: true,
-      min: 0,
-      max: 5,
     },
     safety: {
       type: Number,
@@ -52,17 +53,6 @@ const ReviewSchema: Schema = new Schema<IReview>(
       required: true,
       min: 0,
       max: 5,
-    },
-    name: {
-      type: String,
-      required: isRequired,
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: isRequired,
-      trim: true,
-      lowercase: true,
     },
     comment: {
       type: String,

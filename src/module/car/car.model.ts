@@ -26,6 +26,7 @@ const CarSchema: Schema = new Schema<ICar>(
     description: { type: String, required: true },
     rentingLocation: { type: LocationSchema, required: true },
     carAmenities: { type: [String], required: true },
+    discount: { type: Number, default: 0 },
     model: { type: String, required: true },
     brand: { type: String, required: true },
     price: { type: Number, required: true },

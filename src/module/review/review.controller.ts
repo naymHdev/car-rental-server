@@ -63,9 +63,32 @@ const findAllReview: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const getSingleReview = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await ReviewServices.getSingleReview(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "successfully retrieve review data",
+    data: result,
+  });
+});
+
+const getAverageReview = catchAsync(async (req, res) => {
+  const result = await ReviewServices.getAverageReview();
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "successfully retrieve review data",
+    data: result,
+  });
+});
+
 const ReviewController = {
   addReview,
   findReview,
   findAllReview,
+  getSingleReview,
+  getAverageReview,
 };
 export default ReviewController;

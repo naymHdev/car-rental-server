@@ -119,7 +119,7 @@ const getFiletype = async () => {
     },
     {
       $project: {
-        fuelType: "$_id",
+        title: "$_id",
         count: 1,
         _id: 0,
       },
@@ -128,10 +128,6 @@ const getFiletype = async () => {
       $sort: { count: -1 },
     },
   ]);
-
-  // Add "All" manually with total sum
-  const total = result.reduce((acc, cur) => acc + cur.count, 0);
-  result.unshift({ fuelType: "All", count: total });
 
   return result;
 };

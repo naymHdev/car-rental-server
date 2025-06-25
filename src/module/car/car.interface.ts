@@ -33,6 +33,7 @@ export interface ICar {
   price: number;
   rentingLocation: ILocation;
   carAmenities: string[];
+  discount: number;
   mileage: IMileage;
   seat: number;
   door: number;
