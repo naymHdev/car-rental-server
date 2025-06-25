@@ -6,10 +6,10 @@ import { ILocation, Role } from "../auth/auth.interface";
 export const LocationSchema = new Schema<ILocation>(
   {
     country: { type: String, required: true, trim: true },
-    state: { type: String, required: true, trim: true },
-    city: { type: String, required: true, trim: true },
-    streetAddress: { type: String, required: true, trim: true },
-    zipCode: { type: String, required: true, trim: true },
+    state: { type: String, required: false, trim: true },
+    city: { type: String, required: false, trim: true },
+    streetAddress: { type: String, required: false, trim: true },
+    zipCode: { type: String, required: false, trim: true },
   },
   { _id: false }
 );

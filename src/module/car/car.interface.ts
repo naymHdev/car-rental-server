@@ -1,3 +1,4 @@
+import { ILocation } from "../auth/auth.interface";
 import { IUser } from "../user/user.interface";
 import { Types } from "mongoose";
 
@@ -26,11 +27,12 @@ export interface IPriceOption {
 export interface ICar {
   vendor: Types.ObjectId;
   carName: string;
-  description: string;
-  rentingLocation: string;
-  carAmenities: string[];
   model: string;
+  brand: string;
+  description: string;
   price: number;
+  rentingLocation: ILocation;
+  carAmenities: string[];
   mileage: IMileage;
   seat: number;
   door: number;

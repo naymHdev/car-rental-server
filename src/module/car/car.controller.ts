@@ -136,12 +136,44 @@ const deleteCar: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+// --------------------- For filters Car API's  ---------------------
+
 const getAllLocations = catchAsync(async (req, res) => {
   const result = await CarService.getAllLocations();
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
     message: "successfully retrieve locations data",
+    data: result,
+  });
+});
+
+const getCarBrands = catchAsync(async (req, res) => {
+  const result = await CarService.getCarBrands();
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "successfully retrieve car brands data",
+    data: result,
+  });
+});
+
+const getCarTypes = catchAsync(async (req, res) => {
+  const result = await CarService.getCarTypes();
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "successfully retrieve car types data",
+    data: result,
+  });
+});
+
+const getFuelTypes = catchAsync(async (req, res) => {
+  const result = await CarService.getFiletype();
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "successfully retrieve fuel types data",
     data: result,
   });
 });
@@ -153,6 +185,9 @@ const CarController = {
   updateCar,
   deleteCar,
   getAllLocations,
+  getCarBrands,
+  getCarTypes,
+  getFuelTypes,
 };
 
 export default CarController;

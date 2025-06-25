@@ -1,15 +1,6 @@
 import { model, Schema, Model } from "mongoose";
 import { IReview } from "./review.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
-
-// const PriceOptionSchema = new Schema<IPriceOption>(
-//   {
-//     select: { type: Number, required: true },
-//     price: { type: Number, required: true },
-//   },
-//   { _id: false }
-// );
-
 const isRequired = function (this: IReview): boolean {
   return !!this.comment;
 };
@@ -38,7 +29,7 @@ const ReviewSchema: Schema = new Schema<IReview>(
       min: 0,
       max: 5,
     },
-    accessibilty: {
+    accessibility: {
       type: Number,
       required: true,
       min: 0,

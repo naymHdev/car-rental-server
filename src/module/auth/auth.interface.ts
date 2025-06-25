@@ -5,10 +5,10 @@ export const Role = ["User", "Vendor", "Admin"] as const;
 
 export interface ILocation {
   country: string;
-  state: string;
-  city: string;
-  streetAddress: string;
-  zipCode: string;
+  state?: string;
+  city?: string;
+  streetAddress?: string;
+  zipCode?: string;
 }
 
 // export interface IAuthProvider extends Document {

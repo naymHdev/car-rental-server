@@ -93,10 +93,47 @@ const deleteCarIntoDbService = async (carId: string, vendor: string) => {
   return { message: `Car with ID ${carId} deleted successfully` };
 };
 
-//  --------- Get Only Locations ----------
+//  --------- For filters car API's  ----------
 const getAllLocations = async () => {
-  const locations = await Car.distinct("rentingLocation");
+  const locations = await Car.distinct("rentingLocation.city");
   return { locations };
+};
+
+const getCarBrands = async () => {
+  const brands = await Car.distinct("brand");
+  return { brands };
+};
+
+const getCarTypes = async () => {
+  const types = await Car.distinct("model");
+  return { types };
+};
+
+const getFiletype = async () => {
+  const result = await Car.aggregate([
+    {
+      $group: {
+        _id: "$fuelType",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        fuelType: "$_id",
+        count: 1,
+        _id: 0,
+      },
+    },
+    {
+      $sort: { count: -1 },
+    },
+  ]);
+
+  // Add "All" manually with total sum
+  const total = result.reduce((acc, cur) => acc + cur.count, 0);
+  result.unshift({ fuelType: "All", count: total });
+
+  return result;
 };
 
 const CarService = {
@@ -106,6 +143,9 @@ const CarService = {
   updateCarIntoDbService,
   deleteCarIntoDbService,
   getAllLocations,
+  getCarBrands,
+  getCarTypes,
+  getFiletype,
 };
 
 export default CarService;

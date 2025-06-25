@@ -2,7 +2,7 @@ import httpStatus from "http-status";
 import { RequestHandler } from "express";
 import catchAsync from "../../utility/catchAsync";
 import sendResponse from "../../utility/sendResponse";
-import ReviewServices from "./review.services";
+import ReviewServices from "./review.service";
 import GenericService from "../../utility/genericService.helpers";
 import Review from "./review.model";
 import { IReview } from "./review.interface";

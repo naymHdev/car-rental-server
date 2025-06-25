@@ -1,6 +1,7 @@
 import { model, Schema, Model } from "mongoose";
 import { GearType, ICar, IMileage, IPriceOption } from "./car.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
+import { LocationSchema } from "../user/user.model";
 
 const PriceOptionSchema = new Schema<IPriceOption>(
   {
@@ -23,9 +24,10 @@ const CarSchema: Schema = new Schema<ICar>(
     vendor: { type: Schema.Types.ObjectId, ref: "Vendor", required: true },
     carName: { type: String, required: true },
     description: { type: String, required: true },
-    rentingLocation: { type: String, required: true },
+    rentingLocation: { type: LocationSchema, required: true },
     carAmenities: { type: [String], required: true },
     model: { type: String, required: true },
+    brand: { type: String, required: true },
     price: { type: Number, required: true },
     mileage: { type: MileageSchema, required: true },
     seat: { type: Number, required: true },

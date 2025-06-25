@@ -5,7 +5,7 @@ export interface IReview {
   orderId: Types.ObjectId;
   price: number;
   safety: number;
-  accessibilty: number;
+  accessibility: number;
   services: number;
   entertainment: number;
   support: number;

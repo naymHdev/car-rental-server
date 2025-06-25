@@ -29,6 +29,9 @@ router.patch(
 router.delete("/delete_car", auth("Vendor"), CarController.deleteCar);
 
 router.get("/locations", CarController.getAllLocations);
+router.get("/car_brands", CarController.getCarBrands);
+router.get("/car_types", CarController.getCarTypes);
+router.get("/fuel_types", CarController.getFuelTypes);
 
 const CarRouter = router;
 export default CarRouter;
