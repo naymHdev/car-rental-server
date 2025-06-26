@@ -26,6 +26,7 @@ export interface IPriceOption {
 
 export interface ICar {
   vendor: Types.ObjectId;
+  reviews?: Types.ObjectId;
   carName: string;
   model: string;
   brand: string;

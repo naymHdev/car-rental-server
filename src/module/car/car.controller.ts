@@ -52,6 +52,17 @@ const findCar: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const singleCarReview = catchAsync(async (req, res) => {
+  const result = await CarService.singleCarReview(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "successfully retrieve single car average review!",
+    data: result,
+  });
+});
+
 const findAllCar: RequestHandler = catchAsync(async (req, res) => {
   const result = await CarService.findAllCarIntoDbService(req.query);
 
@@ -188,6 +199,7 @@ const CarController = {
   getCarBrands,
   getCarTypes,
   getFuelTypes,
+  singleCarReview,
 };
 
 export default CarController;

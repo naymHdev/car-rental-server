@@ -1,48 +1,61 @@
 import httpStatus from "http-status";
 import AppError from "../../app/error/AppError";
-import GenericService from "../../utility/genericService.helpers";
-import { idConverter } from "../../utility/idConverter";
-import { IUser } from "../user/user.interface";
-import User from "../user/user.model";
-import { TReview } from "./review.interface";
 import Review from "./review.model";
+import { IReview } from "./review.interface";
 import Car from "../car/car.model";
-import { ICar } from "../car/car.interface";
 
-const addReviewService = async (payload: TReview) => {
-  const { userId, carId, ...restFields } = payload;
-  const userIdObject = await idConverter(userId);
-  // const orderIdObject = await idConverter(orderId);
-  const carIdObject = await idConverter(carId);
-   await GenericService.findResources<ICar>(Car, carIdObject);
+// const addReviewService = async (payload: TReview) => {
+//   const { userId, carId, ...restFields } = payload;
+//   const userIdObject = await idConverter(userId);
+//   // const orderIdObject = await idConverter(orderId);
+//   const carIdObject = await idConverter(carId);
+//    await GenericService.findResources<ICar>(Car, carIdObject);
 
-  await GenericService.findResources<IUser>(User, userIdObject);
+//   await GenericService.findResources<IUser>(User, userIdObject);
 
-  // await GenericService.findResources<IOrder>(Order);
+//   // await GenericService.findResources<IOrder>(Order);
 
-  const newReview = await Review.create({
-    userId: userIdObject,
-    carId: carIdObject,
-    // orderId: orderIdObject,
-    ...restFields,
-  });
+//   const newReview = await Review.create({
+//     userId: userIdObject,
+//     carId: carIdObject,
+//     // orderId: orderIdObject,
+//     ...restFields,
+//   });
 
-  if (!newReview) {
-    throw new AppError(httpStatus.NOT_FOUND, `Review added failed`);
+//   if (!newReview) {
+//     throw new AppError(httpStatus.NOT_FOUND, `Review added failed`);
+//   }
+
+//   await Car.findByIdAndUpdate(carIdObject, {
+//     $push: {
+//       reviews: newReview._id,
+//     },
+//   })
+
+//   return {
+//     success: true,
+//     message: "Review added and associated with car successfully",
+//     review: newReview,
+//   };
+// };
+
+const addReviewService = async (payload: IReview) => {
+  const result = await Review.create(payload);
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, `Your review not posted!`);
   }
 
-  await Car.findByIdAndUpdate(carIdObject, {
-    $push: {
-      reviews: newReview._id,
-    },
-  })
+  if (result) {
+    const carId = result.carId;
+    await Car.findOneAndUpdate(
+      carId,
+      { $push: { reviews: result._id } },
+      { new: true }
+    );
+  }
 
-
-  return {
-    success: true,
-    message: "Review added and associated with car successfully",
-    review: newReview,
-  };
+  return result;
 };
 
 const getAllReviews = async () => {

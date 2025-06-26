@@ -22,6 +22,7 @@ const MileageSchema = new Schema<IMileage>(
 const CarSchema: Schema = new Schema<ICar>(
   {
     vendor: { type: Schema.Types.ObjectId, ref: "Vendor", required: true },
+    reviews: [{ type: Schema.Types.ObjectId, ref: "Review", require: false }],
     carName: { type: String, required: true },
     description: { type: String, required: true },
     rentingLocation: { type: LocationSchema, required: true },
