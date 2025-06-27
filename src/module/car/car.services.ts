@@ -77,7 +77,7 @@ const singleCarReview = async (carId: string) => {
     },
   ]);
 
-  return reviewStats[0]; // contains all average ratings
+  return reviewStats[0];
 };
 
 const findAllCarIntoDbService = async (query: Record<string, unknown>) => {
@@ -238,6 +238,16 @@ const getFiletype = async () => {
   return result;
 };
 
+const singleCarReviews = async (id: string) => {
+  const result = await Car.findById(id).populate("reviews");
+
+  if (!result?.reviews) {
+    throw new AppError(httpStatus.NOT_FOUND, "No reviews found");
+  }
+
+  return result?.reviews;
+};
+
 const CarService = {
   addNewCarIntoDbService,
   findCarIntoDbService,
@@ -249,6 +259,7 @@ const CarService = {
   getCarTypes,
   getFiletype,
   singleCarReview,
+  singleCarReviews,
 };
 
 export default CarService;

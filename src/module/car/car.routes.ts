@@ -17,6 +17,7 @@ router.post(
 router.get("/car-details/:id", CarController.findCar);
 router.get("/car-reviews/:id", CarController.singleCarReview);
 router.get("/get_all_car", CarController.findAllCar);
+router.get("/single-car-reviews/:id", CarController.getSingleCarReviews);
 
 router.patch(
   "/update_car",

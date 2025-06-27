@@ -189,6 +189,16 @@ const getFuelTypes = catchAsync(async (req, res) => {
   });
 });
 
+const getSingleCarReviews = catchAsync(async (req, res) => {
+  const result = await CarService.singleCarReviews(req.params.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "successfully retrieve single car reviews!",
+    data: result,
+  });
+});
+
 const CarController = {
   addNewCar,
   findCar,
@@ -200,6 +210,7 @@ const CarController = {
   getCarTypes,
   getFuelTypes,
   singleCarReview,
+  getSingleCarReviews,
 };
 
 export default CarController;

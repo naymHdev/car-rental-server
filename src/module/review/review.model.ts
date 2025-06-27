@@ -23,6 +23,8 @@ const ReviewSchema: Schema = new Schema<IReview>(
     price: {
       type: Number,
       required: true,
+      min: 0,
+      max: 5,
     },
     safety: {
       type: Number,
