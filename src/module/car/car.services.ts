@@ -212,11 +212,18 @@ const getCarTypes = async () => {
     },
   ]);
 
+  // Add "All" manually with total sum
+  // const total = result.reduce((acc, cur) => acc + cur.count, 0);
+  // result.unshift({ fuelType: "All", count: total });
+
   return result;
 };
 
-const getFiletype = async () => {
+const getCarFuelTypes = async () => {
   const result = await Car.aggregate([
+    {
+      $unwind: "$fuelType",
+    },
     {
       $group: {
         _id: "$fuelType",
@@ -257,7 +264,7 @@ const CarService = {
   getAllLocations,
   getCarBrands,
   getCarTypes,
-  getFiletype,
+  getCarFuelTypes,
   singleCarReview,
   singleCarReviews,
 };

@@ -180,10 +180,10 @@ const getCarTypes = catchAsync(async (req, res) => {
 });
 
 const getFuelTypes = catchAsync(async (req, res) => {
-  const result = await CarService.getFiletype();
+  const result = await CarService.getCarFuelTypes();
   sendResponse(res, {
     success: true,
-    statusCode: httpStatus.CREATED,
+    statusCode: httpStatus.OK,
     message: "successfully retrieve fuel types data",
     data: result,
   });
