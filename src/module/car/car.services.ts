@@ -255,6 +255,22 @@ const singleCarReviews = async (id: string) => {
   return result?.reviews;
 };
 
+const getMyCar = async (userId: string) => {
+  console.log("userId: ", userId);
+
+  const userIdObject = await idConverter(userId);
+
+  const result = await Car.find({ createdBy: userIdObject }).populate(
+    "reviews"
+  );
+
+  if (!result || result.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, "No car has found for this user");
+  }
+
+  return result;
+};
+
 const CarService = {
   addNewCarIntoDbService,
   findCarIntoDbService,
@@ -267,6 +283,7 @@ const CarService = {
   getCarFuelTypes,
   singleCarReview,
   singleCarReviews,
+  getMyCar,
 };
 
 export default CarService;

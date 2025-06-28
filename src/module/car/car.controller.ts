@@ -199,6 +199,23 @@ const getSingleCarReviews = catchAsync(async (req, res) => {
   });
 });
 
+const getMyCars = catchAsync(async (req, res) => {
+  const userId = req.user?._id;
+
+  if (!userId) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User ID is required", "");
+  }
+
+  const result = await CarService.getMyCar(userId.toString());
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "successfully retrieve my cars!",
+    data: result,
+  });
+});
+
 const CarController = {
   addNewCar,
   findCar,
@@ -211,6 +228,7 @@ const CarController = {
   getFuelTypes,
   singleCarReview,
   getSingleCarReviews,
+  getMyCars,
 };
 
 export default CarController;
