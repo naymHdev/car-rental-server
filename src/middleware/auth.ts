@@ -12,8 +12,8 @@ import { getRoleModels } from "../utility/role.utils";
 const auth = (...requireRoles: string[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
-    console.log("Authorization Header:", authHeader);
-    console.log("Required Roles:", requireRoles);
+    // console.log("Authorization Header:", authHeader);
+    // console.log("Required Roles:", requireRoles);
 
     if (!authHeader) {
       throw new AppError(httpStatus.UNAUTHORIZED, "No token provided", "");
@@ -38,12 +38,12 @@ const auth = (...requireRoles: string[]) => {
     }
 
     const { role, id, email } = decoded;
-    console.log("Decoded JWT Payload:", { role, id, email });
+    // console.log("Decoded JWT Payload:", { role, id, email });
 
     if (requireRoles.length && !requireRoles.includes(role)) {
       throw new AppError(httpStatus.FORBIDDEN, "Access denied", "");
     }
-    console.log("Decoded Token:", decoded);
+    // console.log("Decoded Token:", decoded);
 
     const QueryModel = getRoleModels(role);
     if (!Model) {
@@ -58,7 +58,7 @@ const auth = (...requireRoles: string[]) => {
     if (!isUserExist) {
       throw new AppError(httpStatus.NOT_FOUND, `${role} not found`, "");
     }
-    console.log("decode user:", isUserExist);
+    // console.log("decode user:", isUserExist);
     req.user = isUserExist;
     next();
   });

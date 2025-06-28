@@ -5,28 +5,26 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import notFound from "./middleware/notFound";
 import globalErrorHandler from "./middleware/globalErrorHandler";
-import rateLimit from "express-rate-limit";
 import { createServer } from "http";
 import { socketio } from "./app/config/socketio.config";
 import path from "path";
 
 const app = express();
 const allowedOrigins = ["http://192.168.56.1:3000", "http://192.168.56.1:3001"];
-// const allowedOrigins = ["*"];
 
 export const httpServer = createServer(app);
 socketio(httpServer);
 
-const rateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    status: false,
-    message: "Too many requests, please try again later",
-  },
-});
+// const rateLimiter = rateLimit({
+//   windowMs: 15 * 60 * 10000,
+//   max: 1000,
+//   standardHeaders: true,
+//   legacyHeaders: false,
+//   message: {
+//     status: false,
+//     message: "Too many requests, please try again later",
+//   },
+// });
 
 app.use(express.static(path.resolve(__dirname, "../public/test.html")));
 
@@ -40,7 +38,7 @@ app.use(
     },
   })
 );
-app.use("/api", rateLimiter);
+app.use("/api", router);
 
 app.use(cookieParser());
 app.use(express.json());

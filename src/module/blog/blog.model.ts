@@ -19,7 +19,7 @@ const BlogSchema: Schema = new Schema<IBlog>(
     },
     blogImage: {
       type: String,
-      required: true,
+      required: false,
     },
     category: [
       {
