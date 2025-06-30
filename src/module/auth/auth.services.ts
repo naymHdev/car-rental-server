@@ -89,7 +89,7 @@ const loginService = async (payload: ISignIn) => {
     config.jwt_refresh_secret as string,
     config.refresh_expires_in as string
   );
-  console.log("isUserExist: ", isExist);
+  // console.log("isUserExist: ", isExist);
   return {
     accessToken,
     refreshToken,

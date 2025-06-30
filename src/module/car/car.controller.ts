@@ -210,7 +210,7 @@ const getMyCars = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     success: true,
-    statusCode: httpStatus.CREATED,
+    statusCode: httpStatus.OK,
     message: "successfully retrieve my cars!",
     data: result,
   });

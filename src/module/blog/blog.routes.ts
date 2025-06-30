@@ -17,10 +17,12 @@ router.post(
 router.get("/get_all_blog", BlogController.getAllBlog);
 router.get("/get-blog-details/:id", BlogController.findSingleBlog);
 
+router.get("/my-blogs", auth("Vendor"), BlogController.getMyBlogs);
+
 router.patch(
   "/update_blog/:id",
   auth("Vendor"),
-  upload.fields([{ name: "blogImage", maxCount: 1 }]),
+  upload.fields([{ name: "blogImage", maxCount: 10 }]),
   fileHandle("blogImage"),
   BlogController.updateBlog
 );

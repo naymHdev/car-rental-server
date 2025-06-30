@@ -3,7 +3,7 @@ import catchAsync from "../../utility/catchAsync";
 import httpStatus from "http-status";
 import sendResponse from "../../utility/sendResponse";
 import { RequestHandler } from "express";
-import BlogServices from "./blog.services";
+import BlogServices from "./blog.service";
 import AppError from "../../app/error/AppError";
 import NotificationServices from "../notification/notification.service";
 
@@ -99,12 +99,27 @@ const findSingleBlog: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const getMyBlogs = catchAsync(async (req, res) => {
+  const myId = req.user?._id;
+  // console.log("myId___", myId);
+
+  const result = await BlogServices.getMyBlogs(req.query, myId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "successfully retrieve blog data",
+    data: result,
+  });
+});
+
 const BlogController = {
   createNewBlog,
   getAllBlog,
   updateBlog,
   deleteBlog,
   findSingleBlog,
+  getMyBlogs,
 };
 
 export default BlogController;

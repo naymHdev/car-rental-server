@@ -91,7 +91,24 @@ const getAllBlogs = async (query: Record<string, unknown>) => {
 
   const baseQuery = Blog.find().populate("author");
   const blogsQuery = new QueryBuilder(baseQuery, bQuery)
-    .search([""])
+    .search(["companyName", "blogName"])
+    .filter()
+    .sort()
+    .pagination()
+    .fields();
+
+  const result = await blogsQuery.modelQuery;
+  const meta = await blogsQuery.countTotal();
+
+  return { meta, blogs: result };
+};
+
+const getMyBlogs = async (query: Record<string, unknown>, myId: string) => {
+  const { ...bQuery } = query;
+
+  const baseQuery = Blog.find({ author: myId }).populate("author");
+  const blogsQuery = new QueryBuilder(baseQuery, bQuery)
+    .search(["companyName", "blogName"])
     .filter()
     .sort()
     .pagination()
@@ -110,6 +127,7 @@ const BlogServices = {
   deleteAllBlogIntoDb,
   findSingleBlog,
   getAllBlogs,
+  getMyBlogs,
 };
 
 export default BlogServices;
