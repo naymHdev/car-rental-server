@@ -1,5 +1,5 @@
 import AppError from "../../app/error/AppError";
-import { ICar, TCarUpdate } from "../car/car.interface";
+import { ICar, TCarUpdate } from "./car.interface";
 import httpStatus from "http-status";
 import Car from "./car.model";
 import { idConverter } from "../../utility/idConverter";
@@ -255,16 +255,30 @@ const singleCarReviews = async (id: string) => {
   return result?.reviews;
 };
 
-const getMyCar = async (userId: string) => {
-  console.log("userId: ", userId);
+const getMyCar = async (userId: string, query: Record<string, unknown>) => {
+  const { ...cQuery } = query;
 
-  const userIdObject = await idConverter(userId);
+  const baseQuery = Car.find({ vendor: userId })
+    .populate("vendor")
+    .populate("reviews");
 
-  const result = await Car.find({ createdBy: userIdObject }).populate(
-    "reviews"
-  );
+  const allCarQuery = new QueryBuilder(baseQuery, cQuery)
+    .search([
+      "model",
+      "fuelType",
+      "rentingLocation.city",
+      "carName",
+      "carAmenities",
+    ])
+    .filter()
+    .sort()
+    .pagination()
+    .fields();
 
-  return result;
+  const result = await allCarQuery.modelQuery;
+  const meta = await allCarQuery.countTotal();
+
+  return { meta, cars: result };
 };
 
 const CarService = {

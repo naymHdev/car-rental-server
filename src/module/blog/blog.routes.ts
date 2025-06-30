@@ -27,7 +27,5 @@ router.patch(
 
 router.delete("/delete_blog/:id", BlogController.deleteBlog);
 
-// router.delete("/delete-all-blog", BlogController.deleteAllBlog);
-
 const BlogRouter = router;
 export default BlogRouter;

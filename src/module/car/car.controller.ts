@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import catchAsync from "../../utility/catchAsync";
 import AppError from "../../app/error/AppError";
 import httpStatus from "http-status";
-import CarService from "./car.services";
+import CarService from "./car.service";
 import sendResponse from "../../utility/sendResponse";
 import GenericService from "../../utility/genericService.helpers";
 import { idConverter } from "../../utility/idConverter";
@@ -206,7 +206,7 @@ const getMyCars = catchAsync(async (req, res) => {
     throw new AppError(httpStatus.BAD_REQUEST, "User ID is required", "");
   }
 
-  const result = await CarService.getMyCar(userId.toString());
+  const result = await CarService.getMyCar(userId.toString(), req.query);
 
   sendResponse(res, {
     success: true,
