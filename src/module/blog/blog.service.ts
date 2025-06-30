@@ -9,12 +9,12 @@ const createNewBlogIntoDb = async (payload: IBlog) => {
   const { author } = payload;
 
   if (!author) {
-    throw new AppError(httpStatus.NOT_FOUND, "Author id is required");
+    throw new AppError(httpStatus.NOT_FOUND, "You must be logged in to post a blog");
   }
   const newBlog = await Blog.create({ ...payload });
 
   if (!newBlog) {
-    throw new AppError(httpStatus.NOT_FOUND, "New blog add failed");
+    throw new AppError(httpStatus.NOT_FOUND, "You must be logged in to post a blog");
   }
   return { blog: newBlog };
 };
