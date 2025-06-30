@@ -3,6 +3,7 @@ import AppError from "../../app/error/AppError";
 import { IBlog, TBlogUpdate } from "./blog.interface";
 import Blog from "./blog.model";
 import { idConverter } from "../../utility/idConverter";
+import QueryBuilder from "../../app/builder/QueryBuilder";
 
 const createNewBlogIntoDb = async (payload: IBlog) => {
   const { author } = payload;
@@ -30,9 +31,6 @@ const updateBlogIntoDb = async (payload: TBlogUpdate, blogId: string) => {
   if (!foundBlog) {
     throw new AppError(httpStatus.NOT_FOUND, "No blog has found");
   }
-  // if (author !== foundBlog.author.toString()) {
-  //   throw new AppError(httpStatus.NOT_ACCEPTABLE, "Author does not this blog");
-  // }
 
   Object.assign(foundBlog, updateData);
   foundBlog.save();
@@ -82,13 +80,27 @@ const findSingleBlog = async (blogId: string) => {
   if (!blogId) {
     throw new AppError(httpStatus.NOT_FOUND, "BlogId is required", "");
   }
-  const blogIdObject = await idConverter(blogId);
-  const isExist = await Blog.findById(blogIdObject);
 
-  if (!isExist) {
-    throw new AppError(httpStatus.NOT_FOUND, "Blog not exist in database", "");
-  }
-  return { blog: isExist };
+  const result = await Blog.findById(blogId).populate({ path: "author" });
+
+  return result;
+};
+
+const getAllBlogs = async (query: Record<string, unknown>) => {
+  const { ...bQuery } = query;
+
+  const baseQuery = Blog.find().populate("author");
+  const blogsQuery = new QueryBuilder(baseQuery, bQuery)
+    .search([""])
+    .filter()
+    .sort()
+    .pagination()
+    .fields();
+
+  const result = await blogsQuery.modelQuery;
+  const meta = await blogsQuery.countTotal();
+
+  return { meta, blogs: result };
 };
 
 const BlogServices = {
@@ -97,6 +109,7 @@ const BlogServices = {
   deleteBlogIntoDb,
   deleteAllBlogIntoDb,
   findSingleBlog,
+  getAllBlogs,
 };
 
 export default BlogServices;

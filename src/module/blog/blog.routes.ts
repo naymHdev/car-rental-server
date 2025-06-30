@@ -9,7 +9,7 @@ const router = express.Router();
 router.post(
   "/create_blog",
   auth("Vendor"),
-  upload.fields([{ name: "blogImage", maxCount: 1 }]),
+  upload.fields([{ name: "blogImage", maxCount: 10 }]),
   fileHandle("blogImage"),
   BlogController.createNewBlog
 );
@@ -19,7 +19,7 @@ router.get("/get-blog-details/:id", BlogController.findSingleBlog);
 
 router.patch(
   "/update_blog/:id",
-  auth('Vendor'),
+  auth("Vendor"),
   upload.fields([{ name: "blogImage", maxCount: 1 }]),
   fileHandle("blogImage"),
   BlogController.updateBlog

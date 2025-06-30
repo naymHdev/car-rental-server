@@ -1,9 +1,11 @@
 import { Types } from "mongoose";
+
+
 export interface IBlog {
   author: Types.ObjectId;
   blogName: string;
   details: string;
-  blogImage: string;
+  blogImage: string[];
   category: string[];
   updatedAt: Date;
   createdAt: Date;

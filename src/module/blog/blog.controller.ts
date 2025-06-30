@@ -5,9 +5,6 @@ import sendResponse from "../../utility/sendResponse";
 import { RequestHandler } from "express";
 import BlogServices from "./blog.services";
 import AppError from "../../app/error/AppError";
-import GenericService from "../../utility/genericService.helpers";
-import { IBlog } from "./blog.interface";
-import Blog from "./blog.model";
 import NotificationServices from "../notification/notification.service";
 
 const createNewBlog: RequestHandlerWithFiles = catchAsync(async (req, res) => {
@@ -35,10 +32,7 @@ const createNewBlog: RequestHandlerWithFiles = catchAsync(async (req, res) => {
 });
 
 const getAllBlog: RequestHandler = catchAsync(async (req, res) => {
-  const result = await GenericService.findAllResources<IBlog>(Blog, req.query, [
-    "author",
-    "blogName",
-  ]);
+  const result = await BlogServices.getAllBlogs(req.query);
 
   sendResponse(res, {
     success: true,
@@ -49,7 +43,6 @@ const getAllBlog: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const updateBlog: RequestHandler = catchAsync(async (req, res) => {
-
   const { id } = req.params;
 
   if (!req.user) {
@@ -96,11 +89,11 @@ const deleteBlog = catchAsync(async (req, res) => {
 
 const findSingleBlog: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await Blog.findById(id);
+  const result = await BlogServices.findSingleBlog(id);
 
   sendResponse(res, {
     success: true,
-    statusCode: httpStatus.CREATED,
+    statusCode: httpStatus.OK,
     message: "successfully retrieve blog data",
     data: result,
   });

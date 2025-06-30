@@ -1,11 +1,11 @@
-import { model, Model, Schema } from "mongoose";
+import mongoose, { model, Model, Schema } from "mongoose";
 import { IBlog } from "./blog.interface";
 import MongooseHelper from "../../utility/mongoose.helpers";
 
 const BlogSchema: Schema = new Schema<IBlog>(
   {
     author: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Vendor",
       required: true,
     },
@@ -18,7 +18,7 @@ const BlogSchema: Schema = new Schema<IBlog>(
       required: true,
     },
     blogImage: {
-      type: String,
+      type: [String],
       required: false,
     },
     category: [

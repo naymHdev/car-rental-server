@@ -264,10 +264,6 @@ const getMyCar = async (userId: string) => {
     "reviews"
   );
 
-  if (!result || result.length === 0) {
-    throw new AppError(httpStatus.NOT_FOUND, "No car has found for this user");
-  }
-
   return result;
 };
 
