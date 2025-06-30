@@ -28,7 +28,7 @@ router.patch(
   CarController.updateCar
 );
 
-router.delete("/delete_car", auth("Vendor"), CarController.deleteCar);
+router.patch("/delete_car/:id", auth("Vendor"), CarController.deleteCar);
 
 router.get("/locations", CarController.getAllLocations);
 router.get("/car_brands", CarController.getCarBrands);

@@ -26,6 +26,14 @@ const findCarIntoDbService = async (carId: string) => {
   const foundCar = await Car.findById(carIdObject)
     .populate("vendor")
     .populate("reviews");
+
+  if (foundCar?.published === false) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Car is not published yet by vendor!"
+    );
+  }
+
   if (!foundCar) {
     throw new AppError(httpStatus.NOT_FOUND, "No car has found");
   }
@@ -83,7 +91,10 @@ const singleCarReview = async (carId: string) => {
 const findAllCarIntoDbService = async (query: Record<string, unknown>) => {
   const { minPrice, maxPrice, ...cQuery } = query;
 
-  const baseQuery = Car.find().populate("vendor").populate("reviews");
+  const baseQuery = Car.find({ published: true })
+    .populate("vendor")
+    .populate("reviews");
+
   const allCarQuery = new QueryBuilder(baseQuery, cQuery)
     .search(["model", "fuelType", "rentingLocation"])
     .filter()
@@ -122,26 +133,32 @@ const updateCarIntoDbService = async (payload: TCarUpdate) => {
 };
 
 const deleteCarIntoDbService = async (carId: string, vendor: string) => {
-  const carIdObject = await idConverter(carId);
-  const vendorIdObject = await idConverter(carId);
-
-  if (!carIdObject || !vendorIdObject) {
+  if (!carId || !vendor) {
     throw new AppError(httpStatus.NOT_FOUND, "Car id & vendor id is required");
   }
-  const foundCar = await Car.findById(carIdObject);
-  if (!foundCar) {
-    throw new AppError(httpStatus.NOT_FOUND, "No car has found");
-  }
-  if (vendor !== foundCar.vendor.toString()) {
+
+  const findCar = await Car.findById(carId);
+
+  if (findCar?.vendor.toString() !== vendor.toString()) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
-      "Vendor does not own this car"
+      "Vendor does not match the car's vendor"
     );
   }
-  const deleteCar = await Car.deleteOne({ _id: carIdObject });
-  if (!deleteCar.deletedCount) {
-    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, "Car deletion failed");
+
+  const updatedCar = await Car.findByIdAndUpdate(
+    carId,
+    { published: false, isDeleted: true },
+    { new: true }
+  );
+
+  if (!updatedCar) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to unpublish the car"
+    );
   }
+
   return { message: `Car with ID ${carId} deleted successfully` };
 };
 
@@ -258,7 +275,7 @@ const singleCarReviews = async (id: string) => {
 const getMyCar = async (userId: string, query: Record<string, unknown>) => {
   const { ...cQuery } = query;
 
-  const baseQuery = Car.find({ vendor: userId })
+  const baseQuery = Car.find({ vendor: userId, published: true })
     .populate("vendor")
     .populate("reviews");
 
