@@ -80,17 +80,6 @@ const updateCar: RequestHandler = catchAsync(async (req, res) => {
   req.body.data.vendor = vendor;
   const result = await CarService.updateCarIntoDbService(req.body.data, carId);
 
-  // await NotificationServices.sendNoification({
-  //   ownerId: req.body.data.vendor,
-  //   key: "notification",
-  //   data: {
-  //     id: result.car?._id.toString(),
-  //     message: `Car info updated`,
-  //   },
-  //   receiverId: [req.body.data.vendor],
-  //   notifyAdmin: true,
-  // });
-
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,

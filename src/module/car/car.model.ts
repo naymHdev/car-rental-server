@@ -46,7 +46,6 @@ const CarSchema: Schema = new Schema<ICar>(
     oneWayFees: { type: PriceOptionSchema, required: true },
     gps: { type: PriceOptionSchema, required: true },
     crossBorder: { type: PriceOptionSchema, required: true },
-    // draft: { type: Boolean, required: true },
     published: { type: Boolean, required: true },
     isDeleted: { type: Boolean, default: false },
   },

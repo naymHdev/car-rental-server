@@ -3,6 +3,8 @@ import CarController from "./car.controller";
 import auth from "../../middleware/auth";
 import { upload } from "../../middleware/multer/multer";
 import { fileHandle } from "../../middleware/fileHandle";
+import validationRequest from "../../middleware/validationRequest";
+import { carValidation } from "./car.validation";
 
 const router = express.Router();
 
@@ -25,6 +27,7 @@ router.patch(
   auth("Vendor"),
   upload.fields([{ name: "carImage", maxCount: 5 }]),
   fileHandle("carImage"),
+  validationRequest(carValidation.carUpdateValidation),
   CarController.updateCar
 );
 
