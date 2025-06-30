@@ -21,7 +21,7 @@ router.get("/single-car-reviews/:id", CarController.getSingleCarReviews);
 router.get("/my-cars", auth("Vendor"), CarController.getMyCars);
 
 router.patch(
-  "/update_car",
+  "/update_car/:id",
   auth("Vendor"),
   upload.fields([{ name: "carImage", maxCount: 5 }]),
   fileHandle("carImage"),

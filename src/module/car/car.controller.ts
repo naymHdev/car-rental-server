@@ -9,7 +9,6 @@ import NotificationServices from "../notification/notification.service";
 
 const addNewCar: RequestHandler = catchAsync(async (req, res) => {
   const vendor = req.user._id;
-  console.log("vendor: ", vendor);
 
   if (!vendor) {
     throw new AppError(httpStatus.BAD_REQUEST, "Vendor ID is required", "");
@@ -72,32 +71,25 @@ const findAllCar: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const updateCar: RequestHandler = catchAsync(async (req, res) => {
-  if (!req.user) {
-    throw new AppError(
-      httpStatus.UNAUTHORIZED,
-      "You are not authenticated",
-      ""
-    );
-  }
   const vendor = req.user?._id;
-  console.log("userId: ", vendor.toString());
+  const carId = req.params.id;
 
   if (!vendor) {
     throw new AppError(httpStatus.BAD_REQUEST, "Vendor ID is required", "");
   }
   req.body.data.vendor = vendor;
-  const result = await CarService.updateCarIntoDbService(req.body.data);
+  const result = await CarService.updateCarIntoDbService(req.body.data, carId);
 
-  await NotificationServices.sendNoification({
-    ownerId: req.body.data.vendor,
-    key: "notification",
-    data: {
-      id: result.car?._id.toString(),
-      message: `Car info updated`,
-    },
-    receiverId: [req.body.data.vendor],
-    notifyAdmin: true,
-  });
+  // await NotificationServices.sendNoification({
+  //   ownerId: req.body.data.vendor,
+  //   key: "notification",
+  //   data: {
+  //     id: result.car?._id.toString(),
+  //     message: `Car info updated`,
+  //   },
+  //   receiverId: [req.body.data.vendor],
+  //   notifyAdmin: true,
+  // });
 
   sendResponse(res, {
     success: true,

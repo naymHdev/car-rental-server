@@ -9,7 +9,7 @@ import mongoose from "mongoose";
 
 const addNewCarIntoDbService = async (payload: ICar) => {
   const { vendor } = payload;
-  //   payload.draft = false;
+
   payload.published = true;
   if (!vendor) {
     throw new AppError(httpStatus.NOT_FOUND, "Vendor id is required");
@@ -109,27 +109,23 @@ const findAllCarIntoDbService = async (query: Record<string, unknown>) => {
   return { meta: meta, car: cars };
 };
 
-const updateCarIntoDbService = async (payload: TCarUpdate) => {
-  const { carId, vendor, ...updateData } = payload;
+const updateCarIntoDbService = async (payload: TCarUpdate, carId: string) => {
   const carIdObject = await idConverter(carId);
-  const vendorIdObject = await idConverter(vendor);
 
-  if (!carIdObject || !vendorIdObject) {
-    throw new AppError(httpStatus.NOT_FOUND, "Car id & vendor id is required");
-  }
-  const foundCar = await Car.findById(carIdObject);
-  if (!foundCar) {
-    throw new AppError(httpStatus.NOT_FOUND, "No car has found");
-  }
-  if (vendor !== foundCar.vendor.toString()) {
+  const updateCar = await Car.findByIdAndUpdate(
+    carIdObject,
+    { ...payload },
+    { new: true, runValidators: true }
+  );
+
+  if (!updateCar) {
     throw new AppError(
-      httpStatus.NOT_ACCEPTABLE,
-      "Vendor does not match the car's vendor"
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to update the car"
     );
   }
-  Object.assign(foundCar, updateData);
-  foundCar.save();
-  return { car: foundCar };
+
+  return updateCar;
 };
 
 const deleteCarIntoDbService = async (carId: string, vendor: string) => {

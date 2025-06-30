@@ -36,7 +36,7 @@ const CarSchema: Schema = new Schema<ICar>(
     door: { type: Number, required: true },
     vin: { type: String, required: true },
     fuel: { type: Number, required: true },
-    fuelType: [{ type: String, required: true }],
+    fuelType: { type: String, required: true },
     gearType: { type: String, enum: Object.values(GearType), required: true },
     bodyStyle: [{ type: String, required: true }],
     carImage: [{ type: String, required: true }],

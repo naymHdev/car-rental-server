@@ -40,7 +40,7 @@ export interface ICar {
   door: number;
   vin: string;
   fuel: number;
-  fuelType: string[];
+  fuelType: string;
   gearType: GearType;
   bodyStyle: string[];
   carImage: string[];
