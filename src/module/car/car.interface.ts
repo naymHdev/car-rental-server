@@ -50,7 +50,6 @@ export interface ICar {
   oneWayFees: IPriceOption;
   gps: IPriceOption;
   crossBorder: IPriceOption;
-  // draft: boolean;
   published?: boolean;
   createdAt: Date;
   updatedAt: Date;

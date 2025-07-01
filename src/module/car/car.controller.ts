@@ -77,8 +77,8 @@ const updateCar: RequestHandler = catchAsync(async (req, res) => {
   if (!vendor) {
     throw new AppError(httpStatus.BAD_REQUEST, "Vendor ID is required", "");
   }
-  req.body.data.vendor = vendor;
-  const result = await CarService.updateCarIntoDbService(req.body.data, carId);
+  req.body.vendor = vendor.toString();
+  const result = await CarService.updateCarIntoDbService(req.body, carId);
 
   sendResponse(res, {
     success: true,

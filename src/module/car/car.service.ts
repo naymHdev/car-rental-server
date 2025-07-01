@@ -112,6 +112,8 @@ const findAllCarIntoDbService = async (query: Record<string, unknown>) => {
 const updateCarIntoDbService = async (payload: TCarUpdate, carId: string) => {
   const carIdObject = await idConverter(carId);
 
+  // console.log("payload___", payload);
+
   const updateCar = await Car.findByIdAndUpdate(
     carIdObject,
     { ...payload },

@@ -10,7 +10,6 @@ const locationValidation = z.object({
 
 const carUpdateValidation = z.object({
   body: z.object({
-    vendor: z.string().optional(),
     reviews: z.array(z.string()).optional(),
     carName: z.string().optional(),
     description: z.string().optional(),
