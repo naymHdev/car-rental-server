@@ -54,6 +54,9 @@ const updateBlog: RequestHandler = catchAsync(async (req, res) => {
     throw new AppError(httpStatus.BAD_REQUEST, "Vendor ID is required", "");
   }
   req.body.data.author = vendor;
+
+ 
+
   const result = await BlogServices.updateBlogIntoDb(req.body.data, id);
 
   await NotificationServices.sendNoification({

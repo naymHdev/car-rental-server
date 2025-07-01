@@ -16,24 +16,22 @@ export const fileHandle = (fieldName: string): RequestHandler =>
         throw new AppError(400, "Invalid JSON in data field", errorMessage);
       }
     }
-
-    const files = (req.files as Record<string, Express.Multer.File[]>)[fieldName];
-
+    const files = (req.files as Record<string, Express.Multer.File[]>)[
+      fieldName
+    ];
     if (!files || files.length === 0) {
-      // Optional: Clear the field if no file is uploaded
-      req.body.data[fieldName] = '';
+      req.body.data[`${fieldName}Urls`] = [];
       return next();
     }
-
-    const fileUrls = [];
-
+    const fileList = [];
     for (const file of files) {
-      const url = await fileUploadToS3(file.buffer, file.originalname, fieldName);
-      fileUrls.push(url);
+      const url = await fileUploadToS3(
+        file.buffer,
+        file.originalname,
+        fieldName
+      );
+      fileList.push(url);
     }
-
-    // ✅ Assign a single string if maxCount is 1
-    req.body.data[fieldName] = fileUrls.length === 1 ? fileUrls[0] : fileUrls;
-
+    req.body.data[`${fieldName}`] = fileList;
     next();
   });

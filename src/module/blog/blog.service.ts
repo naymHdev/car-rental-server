@@ -9,12 +9,18 @@ const createNewBlogIntoDb = async (payload: IBlog) => {
   const { author } = payload;
 
   if (!author) {
-    throw new AppError(httpStatus.NOT_FOUND, "You must be logged in to post a blog");
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "You must be logged in to post a blog"
+    );
   }
   const newBlog = await Blog.create({ ...payload });
 
   if (!newBlog) {
-    throw new AppError(httpStatus.NOT_FOUND, "You must be logged in to post a blog");
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "You must be logged in to post a blog"
+    );
   }
   return { blog: newBlog };
 };
@@ -28,8 +34,19 @@ const updateBlogIntoDb = async (payload: TBlogUpdate, blogId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, "Blog id & vendor id is required");
   }
   const foundBlog = await Blog.findById(blogId);
+
+  console.log("blogImg___", payload.blogImage);
+
   if (!foundBlog) {
     throw new AppError(httpStatus.NOT_FOUND, "No blog has found");
+  }
+
+  if (
+    !payload.blogImage ||
+    payload.blogImage.length === 0 ||
+    payload.blogImage[0] === ""
+  ) {
+    payload.blogImage = foundBlog.blogImage;
   }
 
   Object.assign(foundBlog, updateData);
