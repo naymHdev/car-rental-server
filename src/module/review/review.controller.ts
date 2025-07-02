@@ -8,21 +8,20 @@ import Review from "./review.model";
 import { IReview } from "./review.interface";
 import AppError from "../../app/error/AppError";
 import { idConverter } from "../../utility/idConverter";
-import NotificationServices from "../notification/notification.service";
 
 const addReview: RequestHandler = catchAsync(async (req, res) => {
   const result = await ReviewServices.addReviewService(req.body.data);
 
-  await NotificationServices.sendNoification({
-    ownerId: await idConverter(req.body.data.userId),
-    key: "notification",
-    data: {
-      id: result.review?._id.toString(),
-      message: `Add new review`,
-    },
-    receiverId: [await idConverter(req.body.data.userId)],
-    notifyAdmin: true,
-  });
+  // await NotificationServices.sendNoification({
+  //   ownerId: await idConverter(req.body.data.userId),
+  //   key: "notification",
+  //   data: {
+  //     id: result.review?._id.toString(),
+  //     message: `Add new review`,
+  //   },
+  //   receiverId: [await idConverter(req.body.data.userId)],
+  //   notifyAdmin: true,
+  // });
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,

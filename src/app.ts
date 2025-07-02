@@ -46,7 +46,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    // origin: process.env.NODE_ENV === "production" ? config.domain! : "*",
     origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
