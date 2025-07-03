@@ -4,9 +4,9 @@ import { TOrder, TOrderStatus } from "./order.interface";
 import Car from "../car/car.model";
 import { idConverter } from "../../utility/idConverter";
 import { dayCount } from "../../utility/dayCount.utils";
-import Insurance from "../insurance/insurance.model";
-import GenericService from "../../utility/genericService.helpers";
-import { IInsurance } from "../insurance/insurance.interface";
+// import Insurance from "../insurance/insurance.model";
+// import GenericService from "../../utility/genericService.helpers";
+// import { IInsurance } from "../insurance/insurance.interface";
 import Order from "./order.model";
 
 const createOrderServices = async (payload: TOrder) => {
@@ -19,7 +19,6 @@ const createOrderServices = async (payload: TOrder) => {
     discount,
     pickUpLocation,
     dropOffLocation,
-    insuranceId,
   } = payload;
 
   if (
@@ -56,21 +55,22 @@ const createOrderServices = async (payload: TOrder) => {
     addOnTotal += car.crossBorder.price * car.crossBorder.select;
 
   // Insurance check
-  if (addExtra.insurance && !insuranceId) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Insurance ID required if insurance is selected"
-    );
-  }
-  const { insurance } = await GenericService.findResources<IInsurance>(
-    Insurance,
-    insuranceId!
-  );
+  // if (addExtra.insurance && !insuranceId) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     "Insurance ID required if insurance is selected"
+  //   );
+  // }
+  // const { insurance } = await GenericService.findResources<IInsurance>(
+  //   Insurance,
+  //   insuranceId!
+  // );
 
-  addOnTotal += insurance.price;
+  // addOnTotal += insurance.price;
 
   payload.subTotal = baseRent + addOnTotal;
-  payload.total = payload.subTotal - discount!;
+  const validDiscount = typeof discount === "number" ? discount : 0;
+  payload.total = payload.subTotal - validDiscount;
 
   payload.status = "inProgress";
 

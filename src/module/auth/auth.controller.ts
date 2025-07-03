@@ -6,21 +6,8 @@ import config from "../../app/config";
 import sendResponse from "../../utility/sendResponse";
 import NotificationServices from "../notification/notification.service";
 import AppError from "../../app/error/AppError";
-import { IJwtPayload } from "./auth.interface";
 
-const myProfile = catchAsync(async (req, res) => {
-  // console.log('req.user', req.user);
 
-  const isUser = req.user as IJwtPayload;
-  const result = await AuthServices.myProfile(isUser);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Profile retrieved successfully",
-    data: result,
-  });
-});
 
 const signUp: RequestHandler = catchAsync(async (req, res) => {
   const { role } = req.body.data;
@@ -158,7 +145,6 @@ const AuthController = {
   verifyOtp,
   resetPassword,
   updatePassword,
-  myProfile,
 };
 
 export default AuthController;

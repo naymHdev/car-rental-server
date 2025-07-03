@@ -69,7 +69,7 @@ export const UserSchema: Schema = new Schema<IUser>(
       required: [true, "Role is required"],
     },
     photo: {
-      type: String,
+      type: [String],
       required: false,
     },
     isAuthProvider: {

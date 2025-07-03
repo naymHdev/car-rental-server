@@ -2,15 +2,8 @@ import express from "express";
 import validationRequest from "../../middleware/validationRequest";
 import AuthValidationSchema from "./auth.validation";
 import AuthController from "./auth.controller";
-import auth from "../../middleware/auth";
 
 const router = express.Router();
-
-router.get(
-  "/profile",
-  auth("Vendor", "Admin", "User"),
-  AuthController.myProfile
-);
 
 router.post("/signup", AuthController.signUp);
 

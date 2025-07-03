@@ -3,6 +3,12 @@ import { TRole } from "../../types/express";
 
 export const Role = ["User", "Vendor", "Admin"] as const;
 
+export enum ERole {
+  USER = "User",
+  VENDOR = "Vendor",
+  ADMIN = "Admin",
+}
+
 export interface ILocation {
   country: string;
   state?: string;
@@ -11,10 +17,6 @@ export interface ILocation {
   zipCode?: string;
 }
 
-// export interface IAuthProvider extends Document {
-//   sub: string;
-//   authProviderName: string;
-// }
 export interface ISignIn {
   isAuthProvider?: boolean;
   email: string;
@@ -29,8 +31,8 @@ export interface ISignup extends ISignIn {
   userName?: string;
   mobile?: string;
   location?: ILocation;
-  photo: string;
-  role: TRole;
+  photo: string[];
+  role: ERole;
   agreeTcp: boolean;
 }
 

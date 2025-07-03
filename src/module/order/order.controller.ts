@@ -12,7 +12,7 @@ import Order from "./order.model";
 
 const addOrder: RequestHandler = catchAsync(async (req, res) => {
   const user = req.user._id;
-  console.log("user: ", user);
+  // console.log("user: ", user._id);
 
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, "User ID is required", "");

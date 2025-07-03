@@ -10,6 +10,7 @@ import ReviewRouter from "../module/review/review.routes";
 import InsuranceRouter from "../module/insurance/insurance.routes";
 import StripeRouter from "../module/stripe/stripe.routes";
 import NotificationRouter from "../module/notification/notification.routes";
+import OrderRouter from "../module/order/order.routes";
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ const moduleRoutes = [
   { path: "/car", route: CarRouter },
   { path: "/blog", route: BlogRouter },
   { path: "/review", route: ReviewRouter },
-  { path: "/order", route: ReviewRouter },
+  { path: "/order", route: OrderRouter },
   { path: "/insurance", route: InsuranceRouter },
   { path: "/payment", route: StripeRouter },
   { path: "/notification", route: NotificationRouter },

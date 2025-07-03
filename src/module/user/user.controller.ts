@@ -9,10 +9,24 @@ import { IUser } from "./user.interface";
 import { idConverter } from "../../utility/idConverter";
 import UserServices from "./user.services";
 import NotificationServices from "../notification/notification.service";
+import { IJwtPayload } from "../auth/auth.interface";
+
+const myProfile = catchAsync(async (req, res) => {
+  // console.log('req.user', req.user);
+
+  const isUser = req.user as IJwtPayload;
+  const result = await UserServices.myProfile(isUser);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Profile retrieved successfully",
+    data: result,
+  });
+});
 
 const getUser: RequestHandler = catchAsync(async (req, res) => {
   const { userId } = req.query;
-  console.log("carId: ", userId!);
 
   if (!userId || typeof userId !== "string") {
     throw new AppError(httpStatus.BAD_REQUEST, "User ID is required", "");
@@ -45,11 +59,16 @@ const getAllUser: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const updateUser: RequestHandler = catchAsync(async (req, res) => {
+
+  // console.log("req.body.data: ", req.body.data);
+  // console.log("req.user: ", req.user);
+
   if (!req.user) {
     throw new AppError(httpStatus.UNAUTHORIZED, "User not authenticated", "");
   }
+
   const userId = req.user?._id;
-  console.log("userId: ", userId.toString());
+  // console.log("userId: ", userId.toString());
 
   if (!userId) {
     throw new AppError(httpStatus.BAD_REQUEST, "userId is required", "");
@@ -113,6 +132,7 @@ const UserController = {
   getAllUser,
   updateUser,
   deleteUser,
+  myProfile,
 };
 
 export default UserController;
