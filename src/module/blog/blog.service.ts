@@ -35,8 +35,6 @@ const updateBlogIntoDb = async (payload: TBlogUpdate, blogId: string) => {
   }
   const foundBlog = await Blog.findById(blogId);
 
-  console.log("blogImg___", payload.blogImage);
-
   if (!foundBlog) {
     throw new AppError(httpStatus.NOT_FOUND, "No blog has found");
   }

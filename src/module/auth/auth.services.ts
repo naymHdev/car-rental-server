@@ -6,7 +6,7 @@ import { emailRegex } from "../../constants/regex.constants";
 import { idConverter } from "../../utility/idConverter";
 import { jwtHelpers } from "../../app/jwtHelpers/jwtHelpers";
 import { Model } from "mongoose";
-import { ISignIn, ISignup } from "./auth.interface";
+import { IJwtPayload, ISignIn, ISignup } from "./auth.interface";
 import { getRoleModels } from "../../utility/role.utils";
 import { IUser } from "../user/user.interface";
 import { IVendor } from "../vendor/vendor.interface";
@@ -14,6 +14,17 @@ import { IAdmin } from "../admin/admin.interface";
 import User from "../user/user.model";
 import { TResetPassword, TUpdatePassword, TVerifyOtp } from "./auth.constant";
 import Otp from "./auth.model";
+
+const myProfile = async (authUser: IJwtPayload) => {
+  const isUserExists = await User.findById(authUser._id).populate("_id");
+  if (!isUserExists) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+  }
+
+  return {
+    ...isUserExists.toObject(),
+  };
+};
 
 const signUpService = async (payload: ISignup) => {
   // console.log("signUpService:", payload);
@@ -247,6 +258,7 @@ const AuthServices = {
   verifyOtpService,
   resetPasswordService,
   updatePasswordService,
+  myProfile,
 };
 
 export default AuthServices;

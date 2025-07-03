@@ -34,8 +34,6 @@ export interface ISignup extends ISignIn {
   agreeTcp: boolean;
 }
 
-
-
 export interface IOtp {
   userId: Types.ObjectId;
   email: string;
@@ -45,4 +43,13 @@ export interface IOtp {
 
 export interface ISignUpBase extends ISignup {
   comparePassword(plainPassword: string): Promise<boolean>;
+}
+
+export interface IJwtPayload {
+  _id: string;
+  email: string;
+  role: TRole;
+  first_name: string;
+  last_name: string;
+  isActive: boolean;
 }

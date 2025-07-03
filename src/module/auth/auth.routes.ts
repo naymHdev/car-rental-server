@@ -2,20 +2,19 @@ import express from "express";
 import validationRequest from "../../middleware/validationRequest";
 import AuthValidationSchema from "./auth.validation";
 import AuthController from "./auth.controller";
+import auth from "../../middleware/auth";
 
 const router = express.Router();
 
-router.post(
-  "/signup",
-  // validationRequest(AuthValidationSchema.userSignInValidation),
-  AuthController.signUp
+router.get(
+  "/profile",
+  auth("Vendor", "Admin", "User"),
+  AuthController.myProfile
 );
 
-router.post(
-  "/login",
-  // validationRequest(AuthValidationSchema.userSignInValidation),
-  AuthController.login
-);
+router.post("/signup", AuthController.signUp);
+
+router.post("/login", AuthController.login);
 
 router.post(
   "/forgot_password",

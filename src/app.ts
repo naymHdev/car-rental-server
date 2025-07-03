@@ -10,7 +10,7 @@ import { socketio } from "./app/config/socketio.config";
 import path from "path";
 
 const app = express();
-const allowedOrigins = ["http://192.168.56.1:3000", "http://192.168.56.1:3001"];
+const allowedOrigins = ["http://10.10.10.78:3001", "http://10.10.10.78:3000"];
 
 export const httpServer = createServer(app);
 socketio(httpServer);
