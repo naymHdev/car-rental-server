@@ -39,12 +39,15 @@ const updateBlogIntoDb = async (payload: TBlogUpdate, blogId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, "No blog has found");
   }
 
+  // Handle image logic: preserve or merge
   if (
     !payload.blogImage ||
     payload.blogImage.length === 0 ||
     payload.blogImage[0] === ""
   ) {
-    payload.blogImage = foundBlog.blogImage;
+    updateData.blogImage = foundBlog.blogImage; // use previous if none provided
+  } else {
+    updateData.blogImage = [...payload.blogImage]; // merge old + new
   }
 
   Object.assign(foundBlog, updateData);
