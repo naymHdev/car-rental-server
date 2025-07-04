@@ -26,6 +26,11 @@ router.patch(
   fileHandle("blogImage"),
   BlogController.updateBlog
 );
+router.delete(
+  "/blogImage/:id",
+  auth("Vendor"),
+  BlogController.deleteBlogImages
+);
 
 router.delete("/delete_blog/:id", BlogController.deleteBlog);
 

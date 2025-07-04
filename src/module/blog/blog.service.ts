@@ -4,6 +4,7 @@ import { IBlog, TBlogUpdate } from "./blog.interface";
 import Blog from "./blog.model";
 import { idConverter } from "../../utility/idConverter";
 import QueryBuilder from "../../app/builder/QueryBuilder";
+import { deleteMultipleImagesFromS3 } from "../../utility/deletes3Image";
 
 const createNewBlogIntoDb = async (payload: IBlog) => {
   const { author } = payload;
@@ -78,6 +79,8 @@ const updateBlogIntoDb = async (
 };
 
 const deleteBlogImage = async (id: string, image: string) => {
+  console.log("image___", image);
+
   const product = await Blog.findById(id);
   if (!product) throw new AppError(404, "Product not found");
   if (!product.blogImage.includes(image))

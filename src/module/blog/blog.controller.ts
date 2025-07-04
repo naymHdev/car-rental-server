@@ -76,6 +76,21 @@ const updateBlog: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const deleteBlogImages = catchAsync(async (req, res) => {
+
+  console.log("req.body: ", req.body);
+
+  const { id } = req.params;
+  const blogImage = req.body.blogImage;
+  const result = await BlogServices.deleteBlogImage(id, blogImage);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "successfully deleted blog image",
+    data: result,
+  });
+});
+
 const deleteBlog = catchAsync(async (req, res) => {
   const { id } = req.params;
 
@@ -121,6 +136,7 @@ const BlogController = {
   deleteBlog,
   findSingleBlog,
   getMyBlogs,
+  deleteBlogImages,
 };
 
 export default BlogController;
