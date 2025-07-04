@@ -61,7 +61,6 @@ export const UserSchema: Schema = new Schema<IUser>(
     email: {
       type: String,
       required: [true, "Email is required"],
-      unique: [true, "Email must be unique"],
     },
     role: {
       type: String,

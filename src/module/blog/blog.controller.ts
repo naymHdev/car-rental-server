@@ -55,8 +55,6 @@ const updateBlog: RequestHandler = catchAsync(async (req, res) => {
   }
   req.body.data.author = vendor;
 
- 
-
   const result = await BlogServices.updateBlogIntoDb(req.body.data, id);
 
   await NotificationServices.sendNoification({
@@ -72,7 +70,7 @@ const updateBlog: RequestHandler = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     success: true,
-    statusCode: httpStatus.CREATED,
+    statusCode: httpStatus.OK,
     message: "successfully updated blog",
     data: result,
   });
