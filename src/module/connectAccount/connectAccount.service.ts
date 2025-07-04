@@ -1,5 +1,7 @@
 import httpStatus from "http-status";
 import AppError from "../../app/error/AppError";
+import config from "../../app/config";
+import stripe from "../../app/config/stripe.config";
 
  
 const stripLinkAccount = async (userId: string, query: Record<string, any>) => {
@@ -27,7 +29,7 @@ const stripLinkAccount = async (userId: string, query: Record<string, any>) => {
  
     return accountLink.url;
   } catch (error: any) {
-    throw new AppError(StatusCodes.BAD_GATEWAY, error.message);
+    throw new AppError(httpStatus.BAD_GATEWAY, error.message);
   }
 };
  
@@ -35,7 +37,7 @@ const refresh = async (paymentId: string, query: Record<string, any>) => {
   const user = await prisma.user.findFirst({ where: { id: query.userId } });
  
   if (!user) {
-    throw new AppError(StatusCodes.BAD_REQUEST, "User not found!");
+    throw new AppError(httpStatus.BAD_REQUEST, "User not found!");
   }
  
   try {
@@ -48,7 +50,7 @@ const refresh = async (paymentId: string, query: Record<string, any>) => {
     });
     return accountLink.url;
   } catch (error: any) {
-    throw new AppError(StatusCodes.BAD_GATEWAY, error.message);
+    throw new AppError(httpStatus.BAD_GATEWAY, error.message);
   }
 };
  
@@ -81,7 +83,7 @@ const returnUrl = async (
       url,
     };
   } catch (error: any) {
-    throw new AppError(StatusCodes.BAD_REQUEST, error.message);
+    throw new AppError(httpStatus.BAD_REQUEST, error.message);
   }
 };
  
@@ -97,7 +99,7 @@ export const createTransfer = async ({
     const availableBalance = balance.available.reduce((total, bal) => total + bal.amount, 0);
     if (availableBalance < amount) {
       console.log("Insufficient funds to cover the transfer.");
-      throw new AppError(StatusCodes?.BAD_REQUEST, "Insufficient funds to cover the transfer.");
+      throw new AppError(httpStatus?.BAD_REQUEST, "Insufficient funds to cover the transfer.");
     }
  
     return await stripe.transfers.create({

@@ -1,15 +1,36 @@
 import { model, Schema, Model } from "mongoose";
 import MongooseHelper from "../../utility/mongoose.helpers";
-import { IPayment } from "../stripe/stripe.interface";
+import { IPayment } from "./payment.interface";
 
-const PaymentSchema: Schema<IPayment> = new Schema(
+const PaymentSchema = new Schema<IPayment>(
   {
-    orderId: { type: Schema.Types.ObjectId, ref: "Order", required: true },
-    amount: { type: Number, required: true },
-    currency: { type: String, required: true },
-    status: { type: String, required: true },
-    method: { type: String, required: true },
-    paymentIntentId: { type: String, required: true },
+    orderId: {
+      type: Schema.Types.ObjectId,
+      ref: "Order",
+      required: true,
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    subTotal: {
+      type: Number,
+      required: true,
+    },
+    discount: {
+      type: Number,
+      required: true,
+    },
+    total: {
+      type: Number,
+      required: true,
+    },
+    paymentOption: {
+      type: String,
+      enum: ["creditCard", "paypal", "applePay"],
+      required: true,
+    },
   },
   { timestamps: true }
 );
@@ -17,6 +38,7 @@ const PaymentSchema: Schema<IPayment> = new Schema(
 MongooseHelper.applyToJSONTransform(PaymentSchema);
 MongooseHelper.findExistence(PaymentSchema);
 
-const Payment: Model<IPayment> = model<IPayment>("Payment", PaymentSchema);
-
-export default Payment;
+export const Payment: Model<IPayment> = model<IPayment>(
+  "Payment",
+  PaymentSchema
+);
