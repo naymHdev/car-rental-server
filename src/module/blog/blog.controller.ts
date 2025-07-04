@@ -61,7 +61,7 @@ const updateBlog: RequestHandler = catchAsync(async (req, res) => {
     ownerId: req.user?._id,
     key: "notification",
     data: {
-      id: result.blog?._id.toString(),
+      id: result?._id.toString(),
       message: `A blog updated`,
     },
     receiverId: [req.user?._id],
@@ -77,9 +77,6 @@ const updateBlog: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const deleteBlogImages = catchAsync(async (req, res) => {
-
-  console.log("req.body: ", req.body);
-
   const { id } = req.params;
   const blogImage = req.body.blogImage;
   const result = await BlogServices.deleteBlogImage(id, blogImage);
