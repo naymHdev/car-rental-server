@@ -53,6 +53,7 @@ const deleteNotification: RequestHandler = catchAsync(async (req, res) => {
   }
   const result = await GenericService.deleteResources<INotification, "ownerId">(
     Notification,
+  
     await idConverter(req.body.data.id),
     owner,
     "ownerId"

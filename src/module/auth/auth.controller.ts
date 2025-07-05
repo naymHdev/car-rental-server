@@ -6,21 +6,22 @@ import config from "../../app/config";
 import sendResponse from "../../utility/sendResponse";
 import NotificationServices from "../notification/notification.service";
 import AppError from "../../app/error/AppError";
-
-
+// import { otpServices } from "../otp/otp.service";
 
 const signUp: RequestHandler = catchAsync(async (req, res) => {
   const { role } = req.body.data;
-
-  // if (!email || !password) {
-  //   throw new AppError(httpStatus.BAD_REQUEST, "Missing required fields", "");
-  // }
   const result = await AuthServices.signUpService(req.body.data);
   // console.log("register: ", result);
 
   if (!result.signUp || !result.signUp._id) {
     throw new AppError(httpStatus.UNAUTHORIZED, "User not found");
   }
+
+  // let otpToken;
+  // if (result?.verification?.status == false) {
+  //   otpToken = await otpServices.resendOtp(result?.email);
+  // }
+
   await NotificationServices.sendNoification({
     ownerId: result.signUp._id!,
     key: "notification",
@@ -36,7 +37,7 @@ const signUp: RequestHandler = catchAsync(async (req, res) => {
     success: true,
     statusCode: httpStatus.CREATED,
     message: `${role} is registered successfully`,
-    data: result,
+    data: { result },
   });
 });
 

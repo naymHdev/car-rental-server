@@ -16,6 +16,9 @@ const myProfile = async (authUser: IJwtPayload) => {
   };
 };
 const updateUserService = async (payload: TUserUpdate) => {
+
+  // console.log("payload: ", payload);
+
   const { userId, ...updateData } = payload;
   const userIdObject = await idConverter(userId);
 

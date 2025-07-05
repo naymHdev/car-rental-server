@@ -34,6 +34,11 @@ export interface ISignup extends ISignIn {
   photo: string[];
   role: ERole;
   agreeTcp: boolean;
+  verification?: {
+    otp: string | number;
+    expiresAt: Date;
+    status: boolean;
+  };
 }
 
 export interface IOtp {

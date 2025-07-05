@@ -11,6 +11,7 @@ import InsuranceRouter from "../module/insurance/insurance.routes";
 import StripeRouter from "../module/stripe/stripe.routes";
 import NotificationRouter from "../module/notification/notification.routes";
 import OrderRouter from "../module/order/order.routes";
+import { OtpRoutes } from "../module/otp/otp.routes";
 
 const router = express.Router();
 
@@ -27,6 +28,10 @@ const moduleRoutes = [
   { path: "/insurance", route: InsuranceRouter },
   { path: "/payment", route: StripeRouter },
   { path: "/notification", route: NotificationRouter },
+  {
+    path: "/otp",
+    route: OtpRoutes,
+  },
 ];
 
 moduleRoutes.forEach((r) => router.use(r.path, r.route));

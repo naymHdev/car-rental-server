@@ -87,6 +87,23 @@ export const UserSchema: Schema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
+    verification: {
+      otp: {
+        type: Schema.Types.Mixed,
+        default: 0,
+      },
+      expiresAt: {
+        type: Date,
+      },
+      status: {
+        type: Boolean,
+        default: false,
+      },
+      shelter_name: {
+        type: String,
+        required: false,
+      },
+    },
   },
   { timestamps: true }
 );

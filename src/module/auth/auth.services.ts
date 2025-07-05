@@ -14,10 +14,9 @@ import { IAdmin } from "../admin/admin.interface";
 import User from "../user/user.model";
 import { TResetPassword, TUpdatePassword, TVerifyOtp } from "./auth.constant";
 import Otp from "./auth.model";
+import { otpServices } from "../otp/otp.service";
 
 const signUpService = async (payload: ISignup) => {
-  // console.log("signUpService:", payload);
-
   const { email, role } = payload;
   const QueryModel = getRoleModels(role);
 
@@ -37,8 +36,13 @@ const signUpService = async (payload: ISignup) => {
 
   const newUser = await QueryModel?.create(payload);
 
+  let otpToken;
+  if (newUser?.verification?.status == false) {
+    otpToken = await otpServices.resendOtp(newUser?.email);
+  }
+
   const signUp = await QueryModel?.findById(newUser?._id).select("-password");
-  return { signUp: signUp };
+  return { signUp: signUp, otpToken: otpToken };
 };
 
 const loginService = async (payload: ISignIn) => {
@@ -71,6 +75,13 @@ const loginService = async (payload: ISignIn) => {
   }
 
   const user = await QueryModel.findById(await idConverter(isExist._id)).lean();
+
+  if (user?.verification?.status == false) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "You are not verified! Please verify your email address. Check your inbox."
+    );
+  }
 
   const jwtPayload = {
     id: isExist._id.toString(),

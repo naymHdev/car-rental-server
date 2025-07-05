@@ -33,4 +33,8 @@ export default {
     secretKey: process.env.STRIPE_SECRET_KEY,
     apiKey: process.env.STRIPE_API_KEY,
   },
+
+  // Email Sender
+  nodemailer_host_email: process.env.NODEMAILER_HOST_EMAIL,
+  nodemailer_host_pass: process.env.NODEMAILER_HOST_PASS,
 };
