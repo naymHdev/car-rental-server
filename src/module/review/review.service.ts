@@ -3,6 +3,7 @@ import AppError from "../../app/error/AppError";
 import Review from "./review.model";
 import { IReview } from "./review.interface";
 import Car from "../car/car.model";
+import QueryBuilder from "../../app/builder/QueryBuilder";
 
 // const addReviewService = async (payload: TReview) => {
 //   const { userId, carId, ...restFields } = payload;
@@ -58,16 +59,36 @@ const addReviewService = async (payload: IReview) => {
   return result;
 };
 
-const getAllReviews = async () => {
-  const result = await Review.find();
-  if (!result) {
-    throw new AppError(httpStatus.NOT_FOUND, `Review not found`);
-  }
-  return { reviews: result };
+const getAllReviews = async (query: Record<string, unknown>) => {
+  const { ...rQuery } = query;
+
+  const baseQuery = Review.find()
+    .populate("userId")
+    .populate("orderId")
+    .populate({
+      path: "carId",
+      populate: {
+        path: "reviews",
+        populate: [{ path: "userId" }, { path: "orderId" }, { path: "carId" }],
+      },
+    });
+
+  const mainQuery = new QueryBuilder(baseQuery, rQuery)
+    .search(["comment", "services"])
+    .filter()
+    .sort()
+    .pagination()
+    .fields();
+  const result = await mainQuery.modelQuery;
+  const meta = await mainQuery.countTotal();
+  return { meta, reviews: result };
 };
 
 const getSingleReview = async (id: string) => {
-  const result = await Review.findById(id);
+  const result = await Review.findById(id)
+    .populate("userId")
+    .populate("orderId")
+    .populate("carId");
   if (!result) {
     throw new AppError(httpStatus.NOT_FOUND, `Review not found`);
   }

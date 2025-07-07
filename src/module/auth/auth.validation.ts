@@ -100,6 +100,24 @@ const verifyOtpdValidation = z.object({
   }),
 });
 
+// ----------------------- New Validation ----------------------- For Password Reset
+const forgotPassValidation = z.object({
+  body: z.object({
+    email: z.string().email({ message: "Provide a valid email, try again" }),
+  }),
+});
+
+const resetPassValidation = z.object({
+  body: z.object({
+    newPassword: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters" }),
+  }),
+  confirmPassword: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters" }),
+});
+
 const AuthValidationSchema = {
   userSignInValidation,
   resetPasswordValidation,
@@ -107,6 +125,8 @@ const AuthValidationSchema = {
   forgotPasswordValidation,
   verifyOtpdValidation,
   playerSignUpValidation,
+  forgotPassValidation,
+  resetPassValidation,
 };
 
 export default AuthValidationSchema;

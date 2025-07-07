@@ -127,6 +127,14 @@ const deleteUser: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+
+
+
+
+
+
+//  ---------------------------------------------- Get In Touch ----------------------------------------------
+
 const UserController = {
   getUser,
   getAllUser,

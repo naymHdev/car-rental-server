@@ -6,7 +6,6 @@ import config from "../../app/config";
 import sendResponse from "../../utility/sendResponse";
 import NotificationServices from "../notification/notification.service";
 import AppError from "../../app/error/AppError";
-// import { otpServices } from "../otp/otp.service";
 
 const signUp: RequestHandler = catchAsync(async (req, res) => {
   const { role } = req.body.data;
@@ -16,11 +15,6 @@ const signUp: RequestHandler = catchAsync(async (req, res) => {
   if (!result.signUp || !result.signUp._id) {
     throw new AppError(httpStatus.UNAUTHORIZED, "User not found");
   }
-
-  // let otpToken;
-  // if (result?.verification?.status == false) {
-  //   otpToken = await otpServices.resendOtp(result?.email);
-  // }
 
   await NotificationServices.sendNoification({
     ownerId: result.signUp._id!,
@@ -77,64 +71,30 @@ const login: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-const requestForgotPassword: RequestHandler = catchAsync(async (req, res) => {
-  const { email } = req.body.data || {};
-  const result = await AuthServices.requestForgotPasswordService(email);
-
+const fagotPassword = catchAsync(async (req, res) => {
+  // console.log("req.body: ", req.body.email);
+  const result = await AuthServices.forgotPassword(req?.body?.email);
   sendResponse(res, {
-    success: true,
     statusCode: httpStatus.OK,
-    message: `OTP sent to your email:${email}`,
+    success: true,
+    message: "An OTP sent to your email!",
     data: result,
   });
 });
 
-const verifyOtp: RequestHandler = catchAsync(async (req, res) => {
-  const result = await AuthServices.verifyOtpService(req.body.data);
+const resetPassword = catchAsync(async (req, res) => {
+  const authHeader = req?.headers?.authorization;
+  const token = authHeader?.startsWith("Bearer")
+    ? authHeader.split(" ")[1]
+    : authHeader;
+
+
+  const result = await AuthServices.resetPassword(token as string, req?.body);
 
   sendResponse(res, {
-    success: true,
     statusCode: httpStatus.OK,
-    message: "Otp verified successfully",
-    data: result,
-  });
-});
-
-const resetPassword: RequestHandler = catchAsync(async (req, res) => {
-  const result = await AuthServices.resetPasswordService(req.body.data);
-  await NotificationServices.sendNoification({
-    ownerId: req.user?._id,
-    key: "notification",
-    data: {
-      id: result.user._id.toString(),
-      message: `Password reset`,
-    },
-    receiverId: [req.user?._id],
-    notifyAdmin: true,
-  });
-  sendResponse(res, {
     success: true,
-    statusCode: httpStatus.OK,
     message: "Password reset successfully",
-    data: result,
-  });
-});
-const updatePassword: RequestHandler = catchAsync(async (req, res) => {
-  const result = await AuthServices.updatePasswordService(req.body.data);
-  await NotificationServices.sendNoification({
-    ownerId: req.user?._id,
-    key: "notification",
-    data: {
-      id: result.user._id.toString(),
-      message: `Password updated`,
-    },
-    receiverId: [req.user?._id],
-    notifyAdmin: true,
-  });
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "Password updated successfully",
     data: result,
   });
 });
@@ -142,10 +102,8 @@ const updatePassword: RequestHandler = catchAsync(async (req, res) => {
 const AuthController = {
   signUp,
   login,
-  requestForgotPassword,
-  verifyOtp,
+  fagotPassword,
   resetPassword,
-  updatePassword,
 };
 
 export default AuthController;

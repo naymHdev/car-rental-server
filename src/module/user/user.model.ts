@@ -115,5 +115,6 @@ MongooseHelper.findExistence<IUser>(UserSchema);
 MongooseHelper.applyToJSONTransform(UserSchema);
 
 // Export Model
+
 const User: Model<IUser> = model<IUser>("User", UserSchema);
 export default User;

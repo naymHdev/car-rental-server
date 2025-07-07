@@ -1,8 +1,7 @@
+import fs from "fs";
 import httpStatus from "http-status";
 import AppError from "../../app/error/AppError";
 import config from "../../app/config";
-import { sendMail } from "../../app/mailer/sendMail";
-import { emailRegex } from "../../constants/regex.constants";
 import { idConverter } from "../../utility/idConverter";
 import { jwtHelpers } from "../../app/jwtHelpers/jwtHelpers";
 import { Model } from "mongoose";
@@ -12,9 +11,13 @@ import { IUser } from "../user/user.interface";
 import { IVendor } from "../vendor/vendor.interface";
 import { IAdmin } from "../admin/admin.interface";
 import User from "../user/user.model";
-import { TResetPassword, TUpdatePassword, TVerifyOtp } from "./auth.constant";
-import Otp from "./auth.model";
 import { otpServices } from "../otp/otp.service";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import { generateOtp } from "../../utility/generateOtp";
+import moment from "moment";
+import path from "path";
+import { sendEmail } from "../../utility/mailSender";
+import bcrypt from "bcrypt";
 
 const signUpService = async (payload: ISignup) => {
   const { email, role } = payload;
@@ -108,156 +111,187 @@ const loginService = async (payload: ISignIn) => {
   };
 };
 
-const requestForgotPasswordService = async (email: string) => {
-  // console.log("email: ", email);
+const forgotPassword = async (email: string) => {
+  const user = await User.findOne({ email });
 
-  if (!emailRegex.test(email)) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid email format", "");
-  }
-
-  const QueryModel: Model<IUser | IVendor | IAdmin> = User;
-
-  const user = await QueryModel.findOne({ email });
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "Email not registered before", "");
+    throw new AppError(httpStatus.NOT_FOUND, "You are not registered!");
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+  const jwtPayload = {
+    email: email,
+    userId: user?._id,
+  };
 
-  await Otp.deleteMany({ email });
+  const token = jwt.sign(jwtPayload, config.jwt_access_secret as Secret, {
+    expiresIn: "3m",
+  });
+  // console.log('token: ', token);
 
-  const subject = "forgot password";
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2>Password Reset Request</h2>
-      <p>Use the following OTP to reset your password:</p>
-      <h3 style="background: #f0f0f0; padding: 10px; display: inline-block;">${otp}</h3>
-      <p>This code expires in 10 minutes.</p>
-      <p>If you didn't request this, please ignore this email.</p>
-    </div>
-  `;
+  const currentTime = new Date();
+  const otp = generateOtp();
+  const expiresAt = moment(currentTime).add(5, "minute");
 
-  try {
-    await sendMail(email, subject, html);
-
-    const result = await Otp.create({
-      email,
+  await User.findByIdAndUpdate(user?._id, {
+    verification: {
       otp,
       expiresAt,
-    });
-
-    return {
-      email: result.email,
-      otp: otp,
-      expiresAt: result.expiresAt,
-    };
-  } catch (error) {
-    throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to process password reset request",
-      error as string
-    );
-  }
-};
-
-const verifyOtpService = async (payload: TVerifyOtp) => {
-  const otpRecord = await Otp.findOne({
-    email: payload.email,
-    otp: payload.otp,
-    expiresAt: { $gt: new Date() },
+    },
   });
 
-  if (!otpRecord) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid or expired OTP", "");
-  }
-  const QueryModel: Model<IUser | IVendor | IAdmin> = User;
-  if (!QueryModel) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid role provided", "");
-  }
+  const otpEmailPath = path.resolve(
+    process.cwd(),
+    "src",
+    "app",
+    "public",
+    "view",
+    "forgot_pass_mail.html"
+  );
+  // console.log('otpEmailPath: ', otpEmailPath);
 
-  const user = await QueryModel?.findOne({ email: payload.email });
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "Email not registered", "");
-  }
-  await Otp.deleteOne({ _id: otpRecord._id });
-
-  return { user: user };
-};
-
-const resetPasswordService = async (payload: TResetPassword) => {
-  const { userId, newPassword } = payload;
-  // console.log(userId);
-
-  const userIdObject = await idConverter(userId!);
-  const QueryModel: Model<IUser | IVendor | IAdmin> = User;
-  const user = await QueryModel.findOne(
-    { _id: userIdObject, isDeleted: { $ne: true } },
-    { password: 1, email: 1 }
+  await sendEmail(
+    user?.email,
+    "Your reset password OTP is",
+    fs
+      .readFileSync(otpEmailPath, "utf8")
+      .replace("{{otp}}", otp)
+      .replace("{{email}}", user?.email)
   );
 
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
-  }
-
-  const updatedUser = await QueryModel.findOneAndUpdate(
-    { _id: userIdObject, isDeleted: { $ne: true } },
-    { password: newPassword },
-    { new: true }
-  ).select("-password");
-
-  if (!updatedUser) {
-    throw new AppError(httpStatus.NOT_FOUND, "Failed to reset password", "");
-  }
-
-  return { user: updatedUser };
+  return { email, token };
 };
 
-const updatePasswordService = async (payload: TUpdatePassword) => {
-  const { userId, password, newPassword } = payload;
-  // console.log(userId);
+// const resetPassword = async (
+//   token: string,
+//   payload: { newPassword: string; confirmPassword: string },
+// ) => {
+//   let decode;
+//   try {
+//     decode = jwt.verify(
+//       token,
+//       config.jwt_access_secret as string,
+//     ) as JwtPayload;
+//   } catch (err: any) {
+//     throw new AppError(
+//       httpStatus.UNAUTHORIZED,
+//       'Session has expired. Please try again',
+//     );
+//   }
 
-  const userIdObject = await idConverter(userId!);
-  const QueryModel: Model<IUser | IVendor | IAdmin> = User;
-  const user = await QueryModel.findOne(
-    { _id: userIdObject, isDeleted: { $ne: true } },
-    { password: 1, email: 1 }
-  );
+//   const user: IUser | null = await User.findById(decode?.userId).select(
+//     'verification',
+//   );
 
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found", "");
-  }
+//   if (!user) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+//   }
 
-  const isPasswordValid = await user.comparePassword(password);
+//   if (
+//     !user?.verification?.expiresAt ||
+//     new Date() > new Date(user.verification.expiresAt)
+//   ) {
+//     throw new AppError(httpStatus.FORBIDDEN, 'Session has expired');
+//   }
 
-  if (!isPasswordValid) {
+//   if (!user?.verification?.status) {
+//     throw new AppError(httpStatus.FORBIDDEN, 'OTP is not verified yet');
+//   }
+
+//   console.log('payload: pass ', payload.newPassword);
+
+//   if (payload?.newPassword !== payload?.confirmPassword) {
+//     throw new AppError(
+//       httpStatus.BAD_REQUEST,
+//       'New password and confirm password do not match',
+//     );
+//   }
+
+//   const hashedPassword = await bcrypt.hash(
+//     payload?.newPassword,
+//     Number(config.bcrypt_salt_rounds),
+//   );
+
+//   // console.log('hashedPassword: ', hashedPassword);
+
+//   const result = await User.findByIdAndUpdate(decode?.userId, {
+//     password: hashedPassword,
+//     verification: {
+//       otp: 0,
+//       status: true,
+//     },
+//   });
+
+//   return result;
+// };
+
+const resetPassword = async (
+  token: string,
+  payload: { newPassword: string; confirmPassword: string }
+) => {
+
+  // console.log('token: ', token);
+
+  let decode;
+  try {
+    decode = jwt.verify(
+      token,
+      config.jwt_access_secret as string
+    ) as JwtPayload;
+  } catch (err: any) {
     throw new AppError(
-      httpStatus.FORBIDDEN,
-      "Current password is incorrect",
-      ""
+      httpStatus.UNAUTHORIZED,
+      "Session has expired. Please try again"
     );
   }
 
-  const updatedUser = await QueryModel.findOneAndUpdate(
-    { _id: userIdObject, isDeleted: { $ne: true } },
-    { password: newPassword },
-    { new: true }
-  ).select("-password");
+  // console.log("decode: ", decode);
 
-  if (!updatedUser) {
-    throw new AppError(httpStatus.NOT_FOUND, "Failed to update password", "");
+  const user = await User.findById(decode?.id);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
 
-  return { user: updatedUser };
+  if (
+    !user?.verification?.expiresAt ||
+    new Date() > new Date(user.verification.expiresAt)
+  ) {
+    throw new AppError(httpStatus.FORBIDDEN, "Session has expired");
+  }
+
+  if (!user?.verification?.status) {
+    throw new AppError(httpStatus.FORBIDDEN, "OTP is not verified yet");
+  }
+
+  if (payload.newPassword !== payload.confirmPassword) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "New password and confirm password do not match"
+    );
+  }
+
+  const hashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds)
+  );
+
+  user.password = hashedPassword;
+  user.verification.otp = 0;
+  user.verification.status = true;
+
+  await user.save(); // ✅ Ensures full Mongoose validation and hooks
+
+  return {
+    _id: user._id,
+    email: user.email,
+  };
 };
 
 const AuthServices = {
   signUpService,
   loginService,
-  requestForgotPasswordService,
-  verifyOtpService,
-  resetPasswordService,
-  updatePasswordService,
+  forgotPassword,
+  resetPassword,
 };
 
 export default AuthServices;

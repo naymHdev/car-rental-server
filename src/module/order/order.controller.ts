@@ -108,11 +108,29 @@ const updateOrder: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const findMyOrders = catchAsync(async (req, res) => {
+  const userId = req.user?._id;
+
+  if (!userId) {
+    throw new AppError(httpStatus.BAD_REQUEST, "You are not logged in.");
+  }
+
+  const result = await OrderServices.findAllMyOrders(userId, req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "successfully retrieve all order data",
+    data: result,
+  });
+});
+
 const OrderController = {
   addOrder,
   findOrder,
   findAllOrder,
   updateOrder,
+  findMyOrders,
 };
 
 export default OrderController;

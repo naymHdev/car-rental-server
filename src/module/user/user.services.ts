@@ -30,8 +30,8 @@ const updateUserService = async (payload: TUserUpdate) => {
     throw new AppError(httpStatus.NOT_FOUND, "No user has found");
   }
 
-  console.log("userId: ", userId.toString());
-  console.log("foundUser._id.toString(): ", foundUser._id.toString());
+  // console.log("userId: ", userId.toString());
+  // console.log("foundUser._id.toString(): ", foundUser._id.toString());
 
   if (userId.toString() !== foundUser._id.toString()) {
     throw new AppError(
@@ -43,6 +43,9 @@ const updateUserService = async (payload: TUserUpdate) => {
   foundUser.save();
   return { user: foundUser };
 };
+
+
+//  ---------------------------------------------- Get In Touch ----------------------------------------------
 
 const UserServices = {
   updateUserService,

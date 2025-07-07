@@ -10,7 +10,7 @@ import { sendEmail } from "../../utility/mailSender";
 import User from "../user/user.model";
 
 const verifyOtp = async (token: string, otp: string | number) => {
-  console.log("token", token);
+  // console.log("token", token);
   if (!token) {
     throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
   }

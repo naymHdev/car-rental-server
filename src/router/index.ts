@@ -12,6 +12,7 @@ import StripeRouter from "../module/stripe/stripe.routes";
 import NotificationRouter from "../module/notification/notification.routes";
 import OrderRouter from "../module/order/order.routes";
 import { OtpRoutes } from "../module/otp/otp.routes";
+import { GetInTouchRouter } from "../module/getInTouch/getInTouch.routes";
 
 const router = express.Router();
 
@@ -31,6 +32,10 @@ const moduleRoutes = [
   {
     path: "/otp",
     route: OtpRoutes,
+  },
+  {
+    path: "/getInTouch",
+    route: GetInTouchRouter,
   },
 ];
 

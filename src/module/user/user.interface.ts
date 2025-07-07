@@ -9,3 +9,4 @@ export interface IUser extends ISignup {
 export type TUserUpdate = Partial<IUser> & {
   userId: string;
 };
+

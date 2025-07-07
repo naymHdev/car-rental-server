@@ -1,7 +1,7 @@
 import express from "express";
-import validationRequest from "../../middleware/validationRequest";
-import AuthValidationSchema from "./auth.validation";
 import AuthController from "./auth.controller";
+import validateRequest from "../../middleware/validationRequest";
+import AuthValidationSchema from "./auth.validation";
 
 const router = express.Router();
 
@@ -10,27 +10,15 @@ router.post("/signup", AuthController.signUp);
 router.post("/login", AuthController.login);
 
 router.post(
-  "/forgot_password",
-  validationRequest(AuthValidationSchema.forgotPasswordValidation),
-  AuthController.requestForgotPassword
+  "/forgot-password",
+  AuthController.fagotPassword,
+  validateRequest(AuthValidationSchema.forgotPassValidation)
 );
 
 router.post(
-  "/verify_otp",
-  validationRequest(AuthValidationSchema.verifyOtpdValidation),
-  AuthController.verifyOtp
-);
-
-router.put(
-  "/reset_password",
-  validationRequest(AuthValidationSchema.resetPasswordValidation),
-  AuthController.resetPassword
-);
-
-router.patch(
-  "/update_password",
-  validationRequest(AuthValidationSchema.updatePasswordValidation),
-  AuthController.updatePassword
+  "/reset-password",
+  AuthController.resetPassword,
+  validateRequest(AuthValidationSchema.resetPassValidation)
 );
 
 const AuthRouter = router;

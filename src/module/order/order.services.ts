@@ -8,6 +8,7 @@ import { dayCount } from "../../utility/dayCount.utils";
 // import GenericService from "../../utility/genericService.helpers";
 // import { IInsurance } from "../insurance/insurance.interface";
 import Order from "./order.model";
+import QueryBuilder from "../../app/builder/QueryBuilder";
 
 const createOrderServices = async (payload: TOrder) => {
   const {
@@ -99,8 +100,30 @@ const orderStatuaServices = async (payload: TOrderStatus) => {
   return { order: foundOrder };
 };
 
+const findAllMyOrders = async (
+  userId: string,
+  query: Record<string, unknown>
+) => {
+  const { ...oQuery } = query;
+
+  const baseQuery = Order.find({ userId: await idConverter(userId) }).populate('carId').populate('userId');
+
+  const allOrderQuery = new QueryBuilder(baseQuery, oQuery)
+    .search([])
+    .filter()
+    .sort()
+    .pagination()
+    .fields();
+
+  const result = await allOrderQuery.modelQuery;
+  const meta = await allOrderQuery.countTotal();
+
+  return { meta, orders: result };
+};
+
 const OrderServices = {
   createOrderServices,
   orderStatuaServices,
+  findAllMyOrders,
 };
 export default OrderServices;

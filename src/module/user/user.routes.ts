@@ -25,5 +25,7 @@ router.patch(
 
 router.delete("/delete_user", UserController.deleteUser);
 
+//  ---------------------------------------------- Get In Touch ----------------------------------------------
+
 const UserRouter = router;
 export default UserRouter;

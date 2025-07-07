@@ -47,17 +47,27 @@ const findReview: RequestHandler = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const findAllReview: RequestHandler = catchAsync(async (req, res) => {
-  const result = await GenericService.findAllResources<IReview>(
-    Review,
-    req.query,
-    ["userId", "orderId"]
-  );
+// const findAllReview: RequestHandler = catchAsync(async (req, res) => {
+//   const result = await GenericService.findAllResources<IReview>(
+//     Review,
+//     req.query,
+//     ["userId", "orderId"]
+//   );
 
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: "successfully retrieved all review data",
+//     data: result,
+//   });
+// });
+
+const findAllReview = catchAsync(async (req, res) => {
+  const result = await ReviewServices.getAllReviews(req.query);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: "successfully retriev all review data",
+    message: "successfully retrieve review data",
     data: result,
   });
 });

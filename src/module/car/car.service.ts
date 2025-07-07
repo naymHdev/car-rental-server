@@ -260,14 +260,19 @@ const getCarFuelTypes = async () => {
   return result;
 };
 
-const singleCarReviews = async (id: string) => {
-  const result = await Car.findById(id).populate("reviews");
+const singleCarReviews = async (carId: string) => {
+  const car = await Car.findById(carId);
 
-  if (!result?.reviews) {
-    throw new AppError(httpStatus.NOT_FOUND, "No reviews found");
+  if (!car || !car.reviews) {
+    throw new AppError(httpStatus.NOT_FOUND, "No reviews found for this car");
   }
 
-  return result?.reviews;
+  const reviews = await Review.find({ _id: { $in: car.reviews } })
+    .populate("carId")
+    .populate("userId")
+    .populate("orderId");
+
+  return reviews;
 };
 
 const getMyCar = async (userId: string, query: Record<string, unknown>) => {
