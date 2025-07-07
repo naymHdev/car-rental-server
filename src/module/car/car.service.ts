@@ -6,6 +6,7 @@ import { idConverter } from "../../utility/idConverter";
 import QueryBuilder from "../../app/builder/QueryBuilder";
 import Review from "../review/review.model";
 import mongoose from "mongoose";
+import { deleteMultipleImagesFromS3 } from "../../utility/deletes3Image";
 
 const addNewCarIntoDbService = async (payload: ICar) => {
   const { vendor } = payload;
@@ -110,24 +111,78 @@ const findAllCarIntoDbService = async (query: Record<string, unknown>) => {
 };
 
 const updateCarIntoDbService = async (payload: TCarUpdate, carId: string) => {
-  const carIdObject = await idConverter(carId);
+  const { carImage, ...restPayload } = payload;
 
-  // console.log("payload___", payload);
+  // Convert author
+  // const authorIdObject = await idConverter(author);
+  // if (!authorIdObject) {
+  //   throw new AppError(httpStatus.NOT_FOUND, "Blog id & vendor id is required");
+  // }
 
-  const updateCar = await Car.findByIdAndUpdate(
-    carIdObject,
-    { ...payload },
-    { new: true, runValidators: true }
-  );
+  // Find the blog
+  const foundBlog = await Car.findById(carId);
+  if (!foundBlog) {
+    throw new AppError(httpStatus.NOT_FOUND, "No blog has found");
+  }
 
-  if (!updateCar) {
-    throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to update the car"
+  // Merge new blogImage with existing only if new images are provided
+  let updatedImages = foundBlog.carImage || [];
+
+  if (Array.isArray(carImage) && carImage.length > 0) {
+    updatedImages = [...carImage, ...updatedImages].filter(
+      (img, index, arr) => arr.indexOf(img) === index
     );
   }
 
-  return updateCar;
+  const result = await Car.findByIdAndUpdate(
+    foundBlog._id,
+    {
+      ...restPayload,
+      blogImage: updatedImages,
+    },
+    { new: true }
+  );
+
+  return result;
+};
+
+// const updateCarIntoDbService = async (payload: TCarUpdate, carId: string) => {
+//   const carIdObject = await idConverter(carId);
+
+//   // console.log("payload___", payload);
+
+//   const updateCar = await Car.findByIdAndUpdate(
+//     carIdObject,
+//     { ...payload },
+//     { new: true, runValidators: true }
+//   );
+
+//   if (!updateCar) {
+//     throw new AppError(
+//       httpStatus.INTERNAL_SERVER_ERROR,
+//       "Failed to update the car"
+//     );
+//   }
+
+//   return updateCar;
+// };
+
+const deleteCarImage = async (id: string, image: string) => {
+  const blog = await Car.findById(id);
+  if (!blog) throw new AppError(404, "Car not found");
+  if (!blog.carImage.includes(image))
+    throw new AppError(404, "Image not found");
+  const newBlog = await Car.findByIdAndUpdate(
+    id,
+    { $pull: { carImage: image } },
+    { new: true }
+  );
+
+  if (newBlog) {
+    const objectKey = image.split(".com/")[1];
+    await deleteMultipleImagesFromS3([objectKey]);
+  }
+  return newBlog;
 };
 
 const deleteCarIntoDbService = async (carId: string, vendor: string) => {
@@ -227,10 +282,6 @@ const getCarTypes = async () => {
     },
   ]);
 
-  // Add "All" manually with total sum
-  // const total = result.reduce((acc, cur) => acc + cur.count, 0);
-  // result.unshift({ fuelType: "All", count: total });
-
   return result;
 };
 
@@ -314,6 +365,7 @@ const CarService = {
   singleCarReview,
   singleCarReviews,
   getMyCar,
+  deleteCarImage,
 };
 
 export default CarService;

@@ -88,6 +88,18 @@ const updateCar: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const deleteCarImages = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const carImage = req.body.carImage;
+  const result = await CarService.deleteCarImage(id, carImage);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "successfully deleted car image",
+    data: result,
+  });
+});
+
 const deleteCar: RequestHandler = catchAsync(async (req, res) => {
   if (!req.user) {
     throw new AppError(
@@ -192,6 +204,7 @@ const CarController = {
   singleCarReview,
   getSingleCarReviews,
   getMyCars,
+  deleteCarImages,
 };
 
 export default CarController;

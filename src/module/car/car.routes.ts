@@ -25,11 +25,12 @@ router.get("/my-cars", auth("Vendor"), CarController.getMyCars);
 router.patch(
   "/update_car/:id",
   auth("Vendor"),
-  // upload.fields([{ name: "carImage", maxCount: 5 }]),
-  // fileHandle("carImage"),
+  upload.fields([{ name: "carImage", maxCount: 5 }]),
+  fileHandle("carImage"),
   validationRequest(carValidation.carUpdateValidation),
   CarController.updateCar
 );
+router.delete("/carImage/:id", auth("Vendor"), CarController.deleteCarImages);
 
 router.patch("/delete_car/:id", auth("Vendor"), CarController.deleteCar);
 
