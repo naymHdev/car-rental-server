@@ -12,7 +12,6 @@ import Order from "./order.model";
 
 const addOrder: RequestHandler = catchAsync(async (req, res) => {
   const user = req.user._id;
-  // console.log("user: ", user._id);
 
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, "User ID is required", "");
@@ -20,6 +19,8 @@ const addOrder: RequestHandler = catchAsync(async (req, res) => {
 
   req.body.data.userId = await idConverter(user);
   const result = await OrderServices.createOrderServices(req.body.data);
+
+  // console.log("result: ", result);
 
   await NotificationServices.sendNoification({
     ownerId: req.body.data.userId,
@@ -125,12 +126,24 @@ const findMyOrders = catchAsync(async (req, res) => {
   });
 });
 
+const orderDetails = catchAsync(async (req, res) => {
+  const result = await OrderServices.findOrderDEtails(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "successfully retrieve all order data",
+    data: result,
+  });
+});
+
 const OrderController = {
   addOrder,
   findOrder,
   findAllOrder,
   updateOrder,
   findMyOrders,
+  orderDetails,
 };
 
 export default OrderController;

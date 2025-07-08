@@ -76,6 +76,31 @@ const createOrderServices = async (payload: TOrder) => {
   payload.status = "inProgress";
 
   const newOrder = await Order.create(payload);
+
+  if (newOrder) {
+    await Car.findOneAndUpdate(
+      {
+        _id: await idConverter(carId),
+      },
+      {
+        $push: {
+          carPicDates: {
+            pickUp: newOrder.pickUp,
+            dropOff: newOrder.dropOff,
+          },
+        },
+      }
+    );
+  }
+
+  if (newOrder) {
+    await Car.findOneAndUpdate(
+      { _id: await idConverter(carId) },
+      { $set: { isRented: true } },
+      { new: true }
+    );
+  }
+
   if (!newOrder) {
     throw new AppError(httpStatus.BAD_REQUEST, "Order not placed yet");
   }
@@ -106,7 +131,9 @@ const findAllMyOrders = async (
 ) => {
   const { ...oQuery } = query;
 
-  const baseQuery = Order.find({ userId: await idConverter(userId) }).populate('carId').populate('userId');
+  const baseQuery = Order.find({ userId: await idConverter(userId) })
+    .populate("carId")
+    .populate("userId");
 
   const allOrderQuery = new QueryBuilder(baseQuery, oQuery)
     .search([])
@@ -121,9 +148,20 @@ const findAllMyOrders = async (
   return { meta, orders: result };
 };
 
+const findOrderDEtails = async (orderId: string) => {
+  const order = await Order.findById(await idConverter(orderId))
+    .populate("carId")
+    .populate("userId");
+  if (!order) {
+    throw new AppError(httpStatus.NOT_FOUND, "Order not found");
+  }
+  return { order };
+};
+
 const OrderServices = {
   createOrderServices,
   orderStatuaServices,
   findAllMyOrders,
+  findOrderDEtails,
 };
 export default OrderServices;

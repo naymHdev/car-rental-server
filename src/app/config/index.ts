@@ -29,9 +29,15 @@ export default {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     bucket: process.env.AWS_S3_BUCKET_NAME,
   },
+
+  // Stripe API
   stripe: {
     secretKey: process.env.STRIPE_SECRET_KEY,
     apiKey: process.env.STRIPE_API_KEY,
+    client_Url: process.env.CLIENT_URL,
+    server_url: process.env.SERVER_URL,
+    cancel_url: process.env.CANCEL_URL,
+    success_url: process.env.SUCCESS_URL,
   },
 
   // Email Sender

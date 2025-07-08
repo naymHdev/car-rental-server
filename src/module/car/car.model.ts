@@ -48,6 +48,13 @@ const CarSchema: Schema = new Schema<ICar>(
     crossBorder: { type: PriceOptionSchema, required: true },
     published: { type: Boolean, required: true },
     isDeleted: { type: Boolean, default: false },
+    isRented: { type: Boolean, default: false },
+    carPicDates: [
+      {
+        pickUp: { type: Date, required: false },
+        dropOff: { type: Date, required: false },
+      },
+    ],
   },
   { timestamps: true }
 );

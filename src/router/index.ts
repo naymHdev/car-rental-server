@@ -13,6 +13,7 @@ import NotificationRouter from "../module/notification/notification.routes";
 import OrderRouter from "../module/order/order.routes";
 import { OtpRoutes } from "../module/otp/otp.routes";
 import { GetInTouchRouter } from "../module/getInTouch/getInTouch.routes";
+import { DashboardRoutes } from "../module/dashboard/dashboard.routes";
 
 const router = express.Router();
 
@@ -36,6 +37,10 @@ const moduleRoutes = [
   {
     path: "/getInTouch",
     route: GetInTouchRouter,
+  },
+  {
+    path: "/dashboards",
+    route: DashboardRoutes,
   },
 ];
 

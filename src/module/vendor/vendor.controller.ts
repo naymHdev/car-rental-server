@@ -12,7 +12,6 @@ import { emitMessage } from "../../utility/socket.helpers";
 
 const getVendor: RequestHandler = catchAsync(async (req, res) => {
   const { VendorId } = req.body.data;
-  console.log("carId: ", VendorId);
 
   if (!VendorId) {
     throw new AppError(httpStatus.BAD_REQUEST, "Vendor ID is required", "");
@@ -49,7 +48,7 @@ const updateVendor: RequestHandler = catchAsync(async (req, res) => {
     throw new AppError(httpStatus.UNAUTHORIZED, "Vendor not authenticated", "");
   }
   const VendorId = req.user?._id;
-  console.log("VendorId: ", VendorId.toString());
+  // console.log("VendorId: ", VendorId.toString());
 
   if (!VendorId) {
     throw new AppError(httpStatus.BAD_REQUEST, "VendorId is required", "");
@@ -74,7 +73,7 @@ const deleteVendor: RequestHandler = catchAsync(async (req, res) => {
     throw new AppError(httpStatus.UNAUTHORIZED, "Vendor not authenticated", "");
   }
   const admin = req.user?._id;
-  console.log("VendorId: ", admin.toString());
+  // console.log("VendorId: ", admin.toString());
 
   if (!admin) {
     throw new AppError(httpStatus.BAD_REQUEST, "Admin ID is required", "");
@@ -98,11 +97,28 @@ const deleteVendor: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const findMyRents = catchAsync(async (req, res) => {
+  const myId = req.user?._id;
+
+  if (!myId) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Vendor ID is required", "");
+  }
+
+  const result = await VendorServices.findMyRents(myId, req.query);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "successfully retrieve my rents",
+    data: result,
+  });
+});
+
 const VendorController = {
   getVendor,
   getAllVendor,
   updateVendor,
   deleteVendor,
+  findMyRents,
 };
 
 export default VendorController;

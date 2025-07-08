@@ -1,25 +1,22 @@
 import httpStatus from "http-status";
 import catchAsync from "../../utility/catchAsync";
-import sendResponse from "../../utility/sendResponse";
 import { PaymentServices } from "./payment.service";
-import AppError from "../../app/error/AppError";
+import sendResponse from "../../utility/sendResponse";
+import config from "../../app/config";
 
-const makePayment = catchAsync(async (req, res) => {
-  const userId = req.user?._id;
-  if (!userId) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User ID is required", "");
-  }
-
-  const result = await PaymentServices.makePayment(userId, req.body.data);
-
+const confirmPayment = catchAsync(async (req, res) => {
+  const result = await PaymentServices.confirmPayment(req?.query);
+  res.redirect(
+    `${config.stripe.client_Url}${config.stripe.success_url}?orderId=${result?.order}&paymentId=${result?._id}`
+  );
   sendResponse(res, {
     success: true,
-    statusCode: httpStatus.CREATED,
-    message: "successfully created payment",
+    statusCode: httpStatus.OK,
     data: result,
+    message: "payment successful",
   });
 });
 
 export const PaymentController = {
-  makePayment,
+  confirmPayment,
 };

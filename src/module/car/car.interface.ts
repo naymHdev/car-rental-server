@@ -24,6 +24,11 @@ export interface IPriceOption {
   price: number;
 }
 
+export interface ICarPicDates {
+  pickUp: Date;
+  dropOff: Date;
+}
+
 export interface ICar {
   vendor: Types.ObjectId;
   reviews?: Types.ObjectId;
@@ -54,6 +59,8 @@ export interface ICar {
   createdAt: Date;
   updatedAt: Date;
   isDeleted: boolean;
+  isRented?: boolean;
+  carPicDates?: ICarPicDates[];
 }
 
 export interface ICarUpdate extends ICar {
