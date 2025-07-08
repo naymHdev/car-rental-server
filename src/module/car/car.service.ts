@@ -111,13 +111,13 @@ const findAllCarIntoDbService = async (query: Record<string, unknown>) => {
 };
 
 const updateCarIntoDbService = async (payload: TCarUpdate, carId: string) => {
-  const { carImage, ...restPayload } = payload;
+  const { vendor, carImage, ...restPayload } = payload;
 
   // Convert author
-  // const authorIdObject = await idConverter(author);
-  // if (!authorIdObject) {
-  //   throw new AppError(httpStatus.NOT_FOUND, "Blog id & vendor id is required");
-  // }
+  const authorIdObject = await idConverter(vendor);
+  if (!authorIdObject) {
+    throw new AppError(httpStatus.NOT_FOUND, "Blog id & vendor id is required");
+  }
 
   // Find the blog
   const foundBlog = await Car.findById(carId);
@@ -145,27 +145,6 @@ const updateCarIntoDbService = async (payload: TCarUpdate, carId: string) => {
 
   return result;
 };
-
-// const updateCarIntoDbService = async (payload: TCarUpdate, carId: string) => {
-//   const carIdObject = await idConverter(carId);
-
-//   // console.log("payload___", payload);
-
-//   const updateCar = await Car.findByIdAndUpdate(
-//     carIdObject,
-//     { ...payload },
-//     { new: true, runValidators: true }
-//   );
-
-//   if (!updateCar) {
-//     throw new AppError(
-//       httpStatus.INTERNAL_SERVER_ERROR,
-//       "Failed to update the car"
-//     );
-//   }
-
-//   return updateCar;
-// };
 
 const deleteCarImage = async (id: string, image: string) => {
   const blog = await Car.findById(id);
