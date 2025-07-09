@@ -14,5 +14,7 @@ router.patch("/update_order_status", OrderController.updateOrder);
 router.get("/my_orders", auth(ERole.USER), OrderController.findMyOrders);
 router.get("/order_details/:id", OrderController.orderDetails);
 
+router.patch("/update_order/:id", auth(ERole.USER), OrderController.updateMyOrder);
+
 const OrderRouter = router;
 export default OrderRouter;

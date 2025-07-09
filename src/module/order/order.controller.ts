@@ -137,6 +137,36 @@ const orderDetails = catchAsync(async (req, res) => {
   });
 });
 
+const updateMyOrder = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  const userId = req.user?._id;
+
+  if (!userId) {
+    throw new AppError(httpStatus.BAD_REQUEST, "You are not logged in.");
+  }
+
+  const result = await OrderServices.updateOrder(id, req.body);
+
+  await NotificationServices.sendNoification({
+    ownerId: userId,
+    key: "notification",
+    data: {
+      id: result.order?._id.toString(),
+      message: `Order info updated to`,
+    },
+    receiverId: [userId],
+    notifyAdmin: true,
+  });
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Updated successfully",
+    data: result,
+  });
+});
+
 const OrderController = {
   addOrder,
   findOrder,
@@ -144,6 +174,7 @@ const OrderController = {
   updateOrder,
   findMyOrders,
   orderDetails,
+  updateMyOrder,
 };
 
 export default OrderController;

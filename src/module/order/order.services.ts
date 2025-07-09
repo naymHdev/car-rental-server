@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import AppError from "../../app/error/AppError";
-import { TOrder, TOrderStatus } from "./order.interface";
+import { IOrder, TOrder, TOrderStatus } from "./order.interface";
 import Car from "../car/car.model";
 import { idConverter } from "../../utility/idConverter";
 import { dayCount } from "../../utility/dayCount.utils";
@@ -150,11 +150,33 @@ const findAllMyOrders = async (
 
 const findOrderDEtails = async (orderId: string) => {
   const order = await Order.findById(await idConverter(orderId))
-    .populate("carId")
+    .populate({
+      path: "carId",
+      populate: {
+        path: "vendor",
+        model: "User",
+      },
+    })
     .populate("userId");
+
   if (!order) {
     throw new AppError(httpStatus.NOT_FOUND, "Order not found");
   }
+  return { order };
+};
+
+const updateOrder = async (orderId: string, payload: IOrder) => {
+
+  console.log("payload: ", payload);
+
+  const order = await Order.findById(await idConverter(orderId));
+
+  if (!order) {
+    throw new AppError(httpStatus.NOT_FOUND, "Order not found");
+  }
+
+  Object.assign(order, payload);
+  order.save();
   return { order };
 };
 
@@ -163,5 +185,6 @@ const OrderServices = {
   orderStatuaServices,
   findAllMyOrders,
   findOrderDEtails,
+  updateOrder,
 };
 export default OrderServices;
