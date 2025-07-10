@@ -59,7 +59,6 @@ const getAllUser: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const updateUser: RequestHandler = catchAsync(async (req, res) => {
-
   // console.log("req.body.data: ", req.body.data);
   // console.log("req.user: ", req.user);
 
@@ -100,7 +99,7 @@ const deleteUser: RequestHandler = catchAsync(async (req, res) => {
     throw new AppError(httpStatus.UNAUTHORIZED, "User not authenticated", "");
   }
   const admin = req.user?._id;
-  console.log("userId: ", admin.toString());
+  // console.log("userId: ", admin.toString());
 
   if (!admin) {
     throw new AppError(httpStatus.BAD_REQUEST, "Admin ID is required", "");
@@ -127,13 +126,27 @@ const deleteUser: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const changePass = catchAsync(async (req, res) => {
+  if (!req.user) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not authenticated", "");
+  }
+  const authHeader = req?.headers?.authorization;
+  const token = authHeader?.startsWith("Bearer")
+    ? authHeader.split(" ")[1]
+    : authHeader;
 
-
-
-
-
-
-//  ---------------------------------------------- Get In Touch ----------------------------------------------
+    
+  const result = await UserServices.changeUserPassword(
+    token as string,
+    req?.body
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "Password changed successfully",
+    data: result,
+  });
+});
 
 const UserController = {
   getUser,
@@ -141,6 +154,7 @@ const UserController = {
   updateUser,
   deleteUser,
   myProfile,
+  changePass,
 };
 
 export default UserController;

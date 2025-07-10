@@ -13,10 +13,46 @@ const confirmPayment = catchAsync(async (req, res) => {
     success: true,
     statusCode: httpStatus.OK,
     data: result,
-    message: "payment successful",
+    message: "payment confirm successful",
+  });
+});
+
+const getAllPayments = catchAsync(async (req, res) => {
+  const result = await PaymentServices.getAllPayments(req?.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    data: result,
+    message: "payment get all successful",
+  });
+});
+
+const getPaymentDetails = catchAsync(async (req, res) => {
+  const result = await PaymentServices.getPaymentDetails(req?.params?.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    data: result,
+    message: "payment details get successful",
+  });
+});
+
+const deletePayment = catchAsync(async (req, res) => {
+  const result = await PaymentServices.deletePayment(req?.params?.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    data: result,
+    message: "payment delete successful",
   });
 });
 
 export const PaymentController = {
   confirmPayment,
+  getAllPayments,
+  getPaymentDetails,
+  deletePayment,
 };

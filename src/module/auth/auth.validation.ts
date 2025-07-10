@@ -112,10 +112,10 @@ const resetPassValidation = z.object({
     newPassword: z
       .string()
       .min(6, { message: "Password must be at least 6 characters" }),
+    confirmPassword: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters" }),
   }),
-  confirmPassword: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
 });
 
 const AuthValidationSchema = {

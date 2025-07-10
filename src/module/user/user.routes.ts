@@ -4,6 +4,8 @@ import { upload } from "../../middleware/multer/multer";
 import { fileHandle } from "../../middleware/fileHandle";
 import auth from "../../middleware/auth";
 import { ERole } from "../auth/auth.interface";
+import validateRequest from "../../middleware/validationRequest";
+import { userValidation } from "./user.validation";
 
 const router = express.Router();
 
@@ -25,7 +27,12 @@ router.patch(
 
 router.delete("/delete_user", UserController.deleteUser);
 
-//  ---------------------------------------------- Get In Touch ----------------------------------------------
+router.patch(
+  "/change_password",
+  auth(ERole.VENDOR, ERole.ADMIN, ERole.USER),
+  validateRequest(userValidation.userPasswordChangeValidation),
+  UserController.changePass
+);
 
 const UserRouter = router;
 export default UserRouter;

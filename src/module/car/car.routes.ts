@@ -11,7 +11,7 @@ const router = express.Router();
 router.post(
   "/add_new_car",
   auth("Vendor"),
-  upload.fields([{ name: "carImage", maxCount: 5 }]),
+  upload.fields([{ name: "carImage", maxCount: 10 }]),
   fileHandle("carImage"),
   CarController.addNewCar
 );
@@ -25,7 +25,7 @@ router.get("/my-cars", auth("Vendor"), CarController.getMyCars);
 router.patch(
   "/update_car/:id",
   auth("Vendor"),
-  upload.fields([{ name: "carImage", maxCount: 5 }]),
+  upload.fields([{ name: "carImage", maxCount: 10 }]),
   fileHandle("carImage"),
   validationRequest(carValidation.carUpdateValidation),
   CarController.updateCar

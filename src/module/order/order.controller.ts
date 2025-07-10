@@ -34,6 +34,8 @@ const addOrder: RequestHandler = catchAsync(async (req, res) => {
     notifyAdmin: true,
   });
 
+  // console.log("new order-------------", result);
+
   const stripeLink = await PaymentServices.checkout(
     result.order,
     req.user._id,
