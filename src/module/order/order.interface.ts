@@ -34,7 +34,6 @@ export interface IOrder {
   updatedAt: Date;
   createdAt: Date;
   isDeleted: boolean;
-  paymentOption: "creditCard" | "paypal" | "applePay";
 }
 
 export type TOrder = Partial<IOrder>;

@@ -13,7 +13,6 @@ interface IPayload {
     name: string;
     quantity: number;
   };
-  // customerId: string;
   paymentId: Types.ObjectId;
 }
 export const createCheckoutSession = async (payload: IPayload) => {
@@ -31,7 +30,7 @@ export const createCheckoutSession = async (payload: IPayload) => {
       },
     ],
 
-    success_url: `${config.base_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${payload?.paymentId}`,
+    success_url: `${config?.base_url}/api/v1/payment/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${payload?.paymentId}`,
     cancel_url: `${config?.stripe.client_Url}${config?.stripe?.cancel_url}`,
 
     // `${config.server_url}/payments/cancel?paymentId=${payload?.paymentId}`,
@@ -53,7 +52,7 @@ export const createCheckoutSession = async (payload: IPayload) => {
     //   },
     // },
     // payment_method_types: ['card', 'amazon_pay', 'cashapp', 'us_bank_account'],
-    payment_method_types: ["card"], //, 'paypal'
+    payment_method_types: ["card"],
   });
   return paymentGatewayData;
 };

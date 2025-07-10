@@ -11,14 +11,14 @@ router.post("/login", AuthController.login);
 
 router.post(
   "/forgot-password",
-  AuthController.fagotPassword,
-  validateRequest(AuthValidationSchema.forgotPassValidation)
+  validateRequest(AuthValidationSchema.forgotPassValidation),
+  AuthController.fagotPassword
 );
 
 router.post(
   "/reset-password",
-  AuthController.resetPassword,
-  validateRequest(AuthValidationSchema.resetPassValidation)
+  validateRequest(AuthValidationSchema.resetPassValidation),
+  AuthController.resetPassword
 );
 
 const AuthRouter = router;

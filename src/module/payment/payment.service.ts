@@ -10,6 +10,7 @@ import { createCheckoutSession } from "./payment.utils";
 import User from "../user/user.model";
 import { IUser } from "../user/user.interface";
 import generateRandomString from "../../utility/generateRandomString";
+import QueryBuilder from "../../app/builder/QueryBuilder";
 
 const stripe = new Stripe(config.stripe?.secretKey as string, {
   apiVersion: "2025-06-30.basil",
@@ -63,7 +64,7 @@ const checkout = async (
 };
 
 const confirmPayment = async (query: Record<string, any>) => {
-  const { sessionId, paymentId } = query;
+  const { sessionId, paymentId } = query; 
   const session = await startSession();
   const PaymentSession = await stripe.checkout.sessions.retrieve(sessionId);
   const paymentIntentId = PaymentSession.payment_intent as string;
@@ -141,7 +142,49 @@ const confirmPayment = async (query: Record<string, any>) => {
   }
 };
 
+const getAllPayments = async (query: Record<string, unknown>) => {
+  const { ...mQuery } = query;
+  const baseQuery = Payment.find().populate("user").populate("order");
+
+  const paymentsQuery = new QueryBuilder(baseQuery, mQuery)
+    .search([])
+    .filter()
+    .sort()
+    .pagination()
+    .fields();
+
+  const payments = await paymentsQuery.modelQuery;
+  const meta = await paymentsQuery.countTotal();
+
+  return { meta, payments };
+};
+
+const getPaymentDetails = async (paymentId: string) => {
+  const payment = await Payment.findById(paymentId)
+    .populate("user")
+    .populate("order")
+    .populate({
+      path: "order",
+      populate: [{ path: "carId" }, { path: "userId" }],
+    });
+  if (!payment) {
+    throw new AppError(httpStatus.NOT_FOUND, "Payment Not Found!");
+  }
+  return payment;
+};
+
+const deletePayment = async (paymentId: string) => {
+  const payment = await Payment.findByIdAndDelete(paymentId);
+  if (!payment) {
+    throw new AppError(httpStatus.NOT_FOUND, "Payment Not Found!");
+  }
+  return payment;
+};
+
 export const PaymentServices = {
   checkout,
   confirmPayment,
+  getAllPayments,
+  getPaymentDetails,
+  deletePayment,
 };

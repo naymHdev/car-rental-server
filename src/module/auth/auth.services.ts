@@ -161,76 +161,10 @@ const forgotPassword = async (email: string) => {
   return { email, token };
 };
 
-// const resetPassword = async (
-//   token: string,
-//   payload: { newPassword: string; confirmPassword: string },
-// ) => {
-//   let decode;
-//   try {
-//     decode = jwt.verify(
-//       token,
-//       config.jwt_access_secret as string,
-//     ) as JwtPayload;
-//   } catch (err: any) {
-//     throw new AppError(
-//       httpStatus.UNAUTHORIZED,
-//       'Session has expired. Please try again',
-//     );
-//   }
-
-//   const user: IUser | null = await User.findById(decode?.userId).select(
-//     'verification',
-//   );
-
-//   if (!user) {
-//     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-//   }
-
-//   if (
-//     !user?.verification?.expiresAt ||
-//     new Date() > new Date(user.verification.expiresAt)
-//   ) {
-//     throw new AppError(httpStatus.FORBIDDEN, 'Session has expired');
-//   }
-
-//   if (!user?.verification?.status) {
-//     throw new AppError(httpStatus.FORBIDDEN, 'OTP is not verified yet');
-//   }
-
-//   console.log('payload: pass ', payload.newPassword);
-
-//   if (payload?.newPassword !== payload?.confirmPassword) {
-//     throw new AppError(
-//       httpStatus.BAD_REQUEST,
-//       'New password and confirm password do not match',
-//     );
-//   }
-
-//   const hashedPassword = await bcrypt.hash(
-//     payload?.newPassword,
-//     Number(config.bcrypt_salt_rounds),
-//   );
-
-//   // console.log('hashedPassword: ', hashedPassword);
-
-//   const result = await User.findByIdAndUpdate(decode?.userId, {
-//     password: hashedPassword,
-//     verification: {
-//       otp: 0,
-//       status: true,
-//     },
-//   });
-
-//   return result;
-// };
-
 const resetPassword = async (
   token: string,
   payload: { newPassword: string; confirmPassword: string }
 ) => {
-
-  // console.log('token: ', token);
-
   let decode;
   try {
     decode = jwt.verify(
@@ -244,26 +178,17 @@ const resetPassword = async (
     );
   }
 
-  // console.log("decode: ", decode);
-
-  const user = await User.findById(decode?.id);
+  const user: IUser | null = await User.findById(decode?.id);
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
-  }
-
-  if (
-    !user?.verification?.expiresAt ||
-    new Date() > new Date(user.verification.expiresAt)
-  ) {
-    throw new AppError(httpStatus.FORBIDDEN, "Session has expired");
   }
 
   if (!user?.verification?.status) {
     throw new AppError(httpStatus.FORBIDDEN, "OTP is not verified yet");
   }
 
-  if (payload.newPassword !== payload.confirmPassword) {
+  if (payload?.newPassword !== payload?.confirmPassword) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "New password and confirm password do not match"
@@ -271,20 +196,23 @@ const resetPassword = async (
   }
 
   const hashedPassword = await bcrypt.hash(
-    payload.newPassword,
+    payload?.newPassword,
     Number(config.bcrypt_salt_rounds)
   );
 
-  user.password = hashedPassword;
-  user.verification.otp = 0;
-  user.verification.status = true;
+  const result = await User.findByIdAndUpdate(
+    decode?.id,
+    {
+      password: hashedPassword,
+      verification: {
+        otp: 0,
+        status: true,
+      },
+    },
+    { new: true }
+  );
 
-  await user.save(); // ✅ Ensures full Mongoose validation and hooks
-
-  return {
-    _id: user._id,
-    email: user.email,
-  };
+  return result;
 };
 
 const AuthServices = {
