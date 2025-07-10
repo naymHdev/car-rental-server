@@ -3,31 +3,18 @@ import { IPayment } from "./payment.interface";
 
 const PaymentSchema = new Schema<IPayment>(
   {
-    orderId: {
-      type: Schema.Types.ObjectId,
-      ref: "Order",
-      required: true,
-    },
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    subTotal: {
-      type: Number,
-      required: false,
-    },
-    discount: {
-      type: Number,
-      required: false,
-    },
-    total: {
-      type: Number,
+    order: {
+      type: Schema.Types.ObjectId,
+      ref: "Order",
       required: true,
     },
-    paymentOption: {
-      type: String,
-      enum: ["creditCard", "paypal", "applePay"],
+    total_amount: {
+      type: Number,
       required: true,
     },
     tranId: {
@@ -42,9 +29,6 @@ const PaymentSchema = new Schema<IPayment>(
   },
   { timestamps: true }
 );
-
-// MongooseHelper.applyToJSONTransform(PaymentSchema);
-// MongooseHelper.findExistence(PaymentSchema);
 
 PaymentSchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });

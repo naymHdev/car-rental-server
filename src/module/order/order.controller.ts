@@ -9,6 +9,7 @@ import NotificationServices from "../notification/notification.service";
 import OrderServices from "./order.services";
 import { IOrder } from "./order.interface";
 import Order from "./order.model";
+import { PaymentServices } from "../payment/payment.service";
 
 const addOrder: RequestHandler = catchAsync(async (req, res) => {
   const user = req.user._id;
@@ -33,17 +34,22 @@ const addOrder: RequestHandler = catchAsync(async (req, res) => {
     notifyAdmin: true,
   });
 
+  const stripeLink = await PaymentServices.checkout(
+    result.order,
+    req.user._id,
+    result.car.carName
+  );
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
     message: "successfully new order added",
-    data: result,
+    data: stripeLink,
   });
 });
 
 const findOrder: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.query;
-  console.log("orderId: ", id!);
 
   if (!id || typeof id !== "string") {
     throw new AppError(httpStatus.BAD_REQUEST, "ID is required", "");

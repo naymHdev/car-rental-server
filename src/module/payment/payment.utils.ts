@@ -1,8 +1,9 @@
 import Stripe from "stripe";
 import config from "../../app/config";
+import { Types } from "mongoose";
 
 const stripe = new Stripe(config.stripe?.secretKey as string, {
-  apiVersion: "2025-03-31.basil",
+  apiVersion: "2025-06-30.basil",
   typescript: true,
 });
 
@@ -13,7 +14,7 @@ interface IPayload {
     quantity: number;
   };
   // customerId: string;
-  paymentId: string;
+  paymentId: Types.ObjectId;
 }
 export const createCheckoutSession = async (payload: IPayload) => {
   const paymentGatewayData = await stripe.checkout.sessions.create({

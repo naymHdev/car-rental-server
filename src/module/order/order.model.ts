@@ -68,6 +68,11 @@ const OrderSchema: Schema = new Schema<IOrder>(
       default: "inProgress",
     },
     isDeleted: { type: Boolean, default: false },
+    paymentOption: {
+      type: String,
+      enum: ["creditCard", "paypal", "applePay"],
+      required: true,
+    },
   },
   { timestamps: true }
 );

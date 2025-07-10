@@ -1,6 +1,5 @@
 import httpStatus from "http-status";
 import Stripe from "stripe";
-import { IPayment } from "./payment.interface";
 import { Payment } from "./payment.model";
 import config from "../../app/config";
 import { IOrder } from "../order/order.interface";
@@ -10,9 +9,10 @@ import AppError from "../../app/error/AppError";
 import { createCheckoutSession } from "./payment.utils";
 import User from "../user/user.model";
 import { IUser } from "../user/user.interface";
+import generateRandomString from "../../utility/generateRandomString";
 
 const stripe = new Stripe(config.stripe?.secretKey as string, {
-  apiVersion: "2025-03-31.basil",
+  apiVersion: "2025-06-30.basil",
   typescript: true,
 });
 
@@ -32,9 +32,11 @@ const checkout = async (
     throw new AppError(httpStatus.NOT_FOUND, "Order Not Found!");
   }
 
+  const createTranId = generateRandomString(10);
+
   const createdPayment = await Payment.create({
     user: userId,
-    tranId: order?.tranId,
+    tranId: createTranId,
     total_amount: order?.total,
     order: order?._id,
   });
@@ -45,9 +47,6 @@ const checkout = async (
       "Failed to create payment"
     );
   }
-
-  if (!createdPayment)
-    throw new AppError(httpStatus.BAD_REQUEST, "payment create failed");
 
   const checkoutSession = await createCheckoutSession({
     // customerId: customer.id,
@@ -141,7 +140,6 @@ const confirmPayment = async (query: Record<string, any>) => {
     session.endSession();
   }
 };
-
 
 export const PaymentServices = {
   checkout,

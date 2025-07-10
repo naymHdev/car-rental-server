@@ -7,6 +7,7 @@ import { INotification } from "./notification.interface";
 import { idConverter } from "../../utility/idConverter";
 import Notification from "./notification.model";
 import sendResponse from "../../utility/sendResponse";
+import NotificationServices from "./notification.service";
 
 const getNotification: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.query;
@@ -53,7 +54,7 @@ const deleteNotification: RequestHandler = catchAsync(async (req, res) => {
   }
   const result = await GenericService.deleteResources<INotification, "ownerId">(
     Notification,
-  
+
     await idConverter(req.body.data.id),
     owner,
     "ownerId"
@@ -67,10 +68,61 @@ const deleteNotification: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const getAllNotifications = catchAsync(async (req, res) => {
+  const result = await NotificationServices.getAllNotifications();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All notifications fetched successfully",
+    data: result,
+  });
+});
+
+const notificationDetails = catchAsync(async (req, res) => {
+  const result = await NotificationServices.getNotificationDetails(
+    req.params.id
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All notifications fetched successfully",
+    data: result,
+  });
+});
+
+const myNotifications = catchAsync(async (req, res) => {
+  const userId = req.user?._id;
+  if (!userId) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User ID is required", "");
+  }
+
+  const result = await NotificationServices.myNotifications(userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All notifications fetched successfully",
+    data: result,
+  });
+});
+
+const adminNotifications = catchAsync(async (req, res) => {
+  const result = await NotificationServices.findAdminNotifications();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All notifications fetched successfully",
+    data: result,
+  });
+});
+
 const NotificationController = {
   getNotification,
   getAllNotification,
   deleteNotification,
+  getAllNotifications,
+  notificationDetails,
+  myNotifications,
+  adminNotifications,
 };
 
 export default NotificationController;

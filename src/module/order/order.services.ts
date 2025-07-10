@@ -166,7 +166,6 @@ const findOrderDEtails = async (orderId: string) => {
 };
 
 const updateOrder = async (orderId: string, payload: IOrder) => {
-
   console.log("payload: ", payload);
 
   const order = await Order.findById(await idConverter(orderId));

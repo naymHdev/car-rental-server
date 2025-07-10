@@ -22,8 +22,34 @@ const sendNoification = async (payload: INotification) => {
   return { notification: newNotification };
 };
 
+const getAllNotifications = async () => {
+  const notifications = await Notification.find().populate("ownerId");
+  return notifications;
+};
+
+const getNotificationDetails = async (id: string) => {
+  const notification = await Notification.findById(id).populate("ownerId");
+  return notification;
+};
+
+const myNotifications = async (id: string) => {
+  console.log("id: ", id);
+
+  const notifications = await Notification.find({ ownerId: id });
+  return notifications;
+};
+
+const findAdminNotifications = async () => {
+  const notifications = await Notification.find({ notifyAdmin: true });
+  return notifications;
+};
+
 const NotificationServices = {
   sendNoification,
+  getAllNotifications,
+  getNotificationDetails,
+  myNotifications,
+  findAdminNotifications,
 };
 
 export default NotificationServices;
